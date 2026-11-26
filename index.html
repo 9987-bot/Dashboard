@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Krypto-Depot</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.coingecko.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.coingecko.com https://api.llama.fi https://stablecoins.llama.fi https://api.alternative.me; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
@@ -97,6 +97,11 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 @media(prefers-reduced-motion:no-preference){.f{transition:width .4s}}
 
 /* iOS-Look */
+.ab2{display:grid;grid-template-columns:128px minmax(0,1fr) 30px;gap:8px;align-items:center;min-height:28px;font-size:13px}
+.ab2 .tr{position:relative;height:8px;border-radius:4px;background:var(--fill)}.ab2 .tr>b{position:absolute;top:0;height:8px;border-radius:4px}.ab2 .tr>u{position:absolute;left:50%;top:-3px;width:1px;height:14px;background:var(--mut)}.ab2 span:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+#ckKp .k{background:var(--fill)}
+.cr{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:.5px solid var(--ln);font-size:15px;font-variant-numeric:tabular-nums}.cr:first-child{border-top:0}.cr span:last-child{text-align:right;font-weight:600}.cr small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.bgl[hidden]{display:none}
 .bgl{display:block;border:0;background:none;padding:2px 0;margin:0;color:var(--acc);font-size:13px;font-weight:500;text-align:left}
 .bgr{display:flex;justify-content:space-between;gap:12px;font-size:15px;margin-top:12px;font-variant-numeric:tabular-nums}.bgr span:last-child{color:var(--mut)}
 .pbar>i{background:var(--acc)}
@@ -213,9 +218,17 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 
 <section id="markt" data-v="mkt">
 <h2>Altseason-Radar</h2>
-<div class="rh" id="rHead"></div><div class="sub" id="rSub"></div>
-<div id="rSig" style="margin-top:10px"></div>
-<p class="note">Modell aus fünf Messwerten, kein Kauf- oder Verkaufssignal. Schwellen: Dominanz ±1,5 Punkte, ETH/BTC ±5 %, Stablecoin-Menge +2 % bzw. −1 %, Breite 75 % bzw. 25 %, Depot gegen Bitcoin ±5 Punkte, jeweils über etwa 30 Tage.</p>
+<div style="display:flex;align-items:baseline;gap:10px"><div class="shv num" id="asiV" style="margin:0">–</div><div class="rh" id="rHead" style="margin:0"></div></div>
+<div style="position:relative;height:10px;border-radius:5px;margin:12px 0 4px;background:linear-gradient(90deg,#FF9F0A,#C7C7CC 50%,#34C759)"><i id="asiM" style="position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--ink);left:50%;margin-left:-2px"></i></div>
+<div class="ax"><span>Bitcoin-Season</span><span>Neutral</span><span>Altcoin-Season</span></div>
+<div class="sub" id="rSub" style="margin-top:8px"></div>
+<div class="cl" style="margin-top:14px">Die Signale im Vergleich (0 bis 100)</div>
+<div id="asiBars"></div>
+<div class="cl" id="asiLab" style="margin-top:14px" hidden>Verlauf des Index, eigene Aufzeichnung</div>
+<div class="fig sm" id="asiFig" hidden><svg id="aChart" role="img" aria-label="Verlauf des Altcoin-Season-Index"></svg></div>
+<div class="cl" style="margin-top:14px">Die Signale im Einzelnen</div>
+<div id="rSig"></div>
+<p class="note">Der Index ist der Durchschnitt der bewertbaren Signale, jedes auf 0 bis 100 umgerechnet (50 ist neutral). Ab 75 gilt Altcoin-Season, unter 25 Bitcoin-Season. Das ist ein eigenes Modell, kein Kauf- oder Verkaufssignal, und nicht identisch mit Indizes anderer Anbieter. Ampel-Schwellen: Dominanz ±1,5 Punkte, ETH/BTC ±5 %, Stablecoin-Menge +2 % bzw. −1 %, Breite 75 % bzw. 25 %, Depot gegen Bitcoin ±5 Punkte, jeweils über etwa 30 Tage.</p>
 <div id="mprog" hidden><div class="sub" id="mptxt"></div></div>
 </section>
 <section data-v="mkt">
@@ -227,10 +240,28 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 <p class="note" id="kNote"></p>
 </section>
 <section data-v="mkt">
-<h2>Krypto-Geldmenge</h2>
-<div class="d24" id="sInfo" style="margin:0 0 6px;min-height:22px"></div>
-<div class="fig sm"><svg id="sChart" role="img" aria-label="Stablecoin-Menge in Milliarden Dollar"></svg></div>
-<p class="note" id="sNote"></p>
+<h2>Fear &amp; Greed</h2>
+<div style="display:flex;align-items:baseline;gap:10px"><div class="shv num" id="fgV" style="margin:0">–</div><div class="d24" id="fgC"></div></div>
+<div style="position:relative;height:10px;border-radius:5px;margin:12px 0 4px;background:linear-gradient(90deg,#FF3B30,#FF9F0A 35%,#FFD60A 50%,#34C759 100%)"><i id="fgM" style="position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--ink);left:0;margin-left:-2px"></i></div>
+<div class="ax"><span>Extreme Angst</span><span>Neutral</span><span>Extreme Gier</span></div>
+<div id="fgRows" style="margin-top:8px"></div>
+<div class="fig sm"><svg id="fChart" role="img" aria-label="Fear and Greed Index der letzten 30 Tage"></svg></div>
+<p class="note">Stimmungsindex von alternative.me für den Bitcoin-Markt, 0 bis 100, täglich aktualisiert. Er misst Stimmung, keine Kurse.</p>
+</section>
+<section data-v="mkt">
+<h2>Marktkapitalisierung</h2>
+<div id="capRows"></div>
+<div class="cl" id="capLab" hidden>Altcoins ohne Bitcoin, eigene Aufzeichnung</div>
+<div class="fig sm" id="capFig" hidden><svg id="cChart" role="img" aria-label="Marktkapitalisierung der Altcoins in Milliarden Dollar"></svg></div>
+<p class="note">Aktuelle Werte von CoinGecko. Den Verlauf gibt es dort nur kostenpflichtig, deshalb schreibt die App ab jetzt einen Punkt pro Tag mit.</p>
+</section>
+<section data-v="mkt">
+<h2>Stablecoins und Börsen</h2>
+<div class="cl">Stablecoin-Menge (alle Dollar-Stablecoins)</div>
+<div id="stRows"></div>
+<div class="cl" style="margin-top:14px">Nettoflüsse auf Börsen (alle Coins)</div>
+<div id="cxRows"></div>
+<p class="note">Quelle: DefiLlama. Zufluss heißt, auf den Börsen liegt mehr Guthaben als vorher, Abfluss weniger. Die Flüsse gelten für alle Coins zusammen. Eine Aufteilung nur nach Stablecoins je Börse gibt es frei nur als sehr große Datei, die für das Handy ungeeignet ist.</p>
 </section>
 <section data-v="mkt">
 <h2>ETH gegen BTC</h2>
@@ -242,6 +273,14 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 <h2>Marktanteile</h2>
 <div class="sum" id="dSum"></div><div class="lg" id="dLg"></div><div class="sub" id="dTot" style="margin-top:8px"></div>
 <p class="note">Der Verlauf der Bitcoin-Dominanz wird ab dem ersten Sync mitgeschrieben, ein Punkt pro Tag.</p>
+</section>
+<section id="check" data-v="ana">
+<h2>Depot-Check</h2>
+<div class="rh" id="ckHead"></div><div class="sub" id="ckSub"></div>
+<div class="kp" id="ckKp" style="margin-top:12px"></div>
+<div class="cl" style="margin-top:16px">Schwächen</div><div id="ckBad"></div>
+<div class="cl" style="margin-top:16px">Stärken</div><div id="ckGood"></div>
+<p class="note">Automatische Auswertung aus Beständen, Scores und Kursen, sie ändert sich mit jedem Sync und jeder Mengenänderung. Schwellen: kritisch ab 15 % Geld in Coins mit Score unter 30, unter 25 % in Coins ab Score 60, mehr als 20 % in Risky und Tot oder mehr als 10 Punkte hinter Bitcoin in 90 Tagen. Kein Rat zum Kauf oder Verkauf.</p>
 </section>
 <section id="analyse" data-v="ana">
 <h2>Analyse der Verteilung</h2>
@@ -288,7 +327,7 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 </section>
 <section id="daten" data-v="data">
 <h2>Daten</h2>
-<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: eine Anfrage an CoinGecko mit den Coin-Namen, ohne Mengen.</p>
+<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: Kursabfragen an CoinGecko mit den Coin-Namen und allgemeine Marktdaten von CoinGecko, DefiLlama und alternative.me. Mengen werden nie übertragen.</p>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
 <label class="btn" style="display:inline-flex;align-items:center;cursor:pointer;position:relative;overflow:hidden">Datei importieren<input id="imp" type="file" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:pointer"></label>
 <button class="btn" id="expBtn" type="button">Backup erstellen</button>
@@ -470,11 +509,36 @@ function render(){
  $("sig").innerHTML=sv.map(x=>`<div style="width:${x[2]}%;background:${x[1]}"></div>`).join("");
  $("sigl").innerHTML=sv.map(x=>`<span><i style="background:${x[1]}"></i>${x[0]} ${pc(x[2])}</span>`).join("");
  $("rwat").innerHTML=R.filter(r=>has(r[0])).map(r=>`<div class="qq"><span><b style="font-weight:500">${r[0]}</b></span><span class="v">${eur(by(r[0]).v)}</span><span class="mm">${r[1]}</span><span class="pl s${r[2]}">${L[r[2]]}</span></div>`).join("");
- renderPlan();
+ renderPlan();renderCheck(T);
  const now=Date.now();
  $("evs").innerHTML=EV.filter(e=>has(e[0])).map(e=>{let dt="laufend",sub="";if(e[1]){const t=new Date(e[1]+"T00:00:00");const n=Math.ceil((t-now)/864e5);dt=t.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"});sub=n>=0?"in "+n+" Tagen":"vorbei"}return`<div class="ev"><span><b style="font-weight:500">${e[0]}</b></span><span class="d">${dt}<small>${sub}</small></span><span>${e[2]}<small>Position: ${eur(by(e[0]).v,0)}</small></span></div>`}).join("");
  drawChart();
 }
+function renderCheck(T){const srt=D.slice().sort((a,b)=>b.v-a.v),sum=f=>D.filter(f).reduce((a,d)=>a+d.sh,0),cnt=f=>D.filter(f).length,eu=f=>D.filter(f).reduce((a,d)=>a+d.v,0);
+ const avg=D.reduce((a,d)=>a+d.sh*d.sc.tot,0)/100,hi=sum(d=>d.sc.tot>=60),lo=sum(d=>d.sc.tot<30),loN=cnt(d=>d.sc.tot<30),loE=eu(d=>d.sc.tot<30),top5=srt.slice(0,5).reduce((a,d)=>a+d.sh,0),neff=1/D.reduce((a,d)=>a+(d.sh/100)**2,0),smN=cnt(d=>d.sh<1),smS=sum(d=>d.sh<1),rk=sum(d=>d.g==="C"||d.g==="D"),core=sum(d=>K.has(d.t)),fl=sum(d=>!!d.sc.fl);
+ const st2=D.reduce((a,d)=>a+d.sc.tot**2,0),gap=D.map(d=>({d,g:d.sh-d.sc.tot**2/st2*100})),over=gap.filter(x=>x.g>2.5).sort((a,b)=>b.g-a.g).slice(0,4),under=D.filter(d=>d.sc.tot>=60&&d.sh<2).sort((a,b)=>b.sc.tot-a.sc.tot).slice(0,4);
+ const nm=a=>a.map(d=>d.t).join(", "),bad=[],good=[];
+ const h90=hSeries(90),bh=MK.btcH,h365=hSeries(365);let vs=null,dd=null;
+ if(h90&&bh&&bh.length>91){const pr=(T/h90.pts[0].v-1)*100,br=(bh[bh.length-1][1]/bh[bh.length-91][1]-1)*100;vs={pr,br,df:pr-br}}
+ if(h365){const mx=Math.max(...h365.pts.map(p=>p.v));dd=(T/mx-1)*100}
+ if(lo>=15)bad.push([3,"Viel Geld in schwachen Coins",pc(lo),loN+" Positionen mit Score unter 30 binden "+eur(loE,0)+". Größte: "+nm(D.filter(d=>d.sc.tot<30).sort((a,b)=>b.v-a.v).slice(0,4))+"."]);else if(lo>=8)bad.push([2,"Geld in schwachen Coins",pc(lo),loN+" Positionen mit Score unter 30 binden "+eur(loE,0)+"."]);else good.push(["Wenig Geld in schwachen Coins",pc(lo),"Nur "+loN+" Positionen liegen unter Score 30."]);
+ if(hi<25)bad.push([3,"Qualitätskern zu klein",pc(hi),"Weniger als ein Viertel des Depots liegt in Coins ab Score 60."+(under.length?" Hoher Score, kleines Gewicht: "+nm(under)+".":"")]);else if(hi<40)bad.push([2,"Qualitätskern ausbaufähig",pc(hi),"Coins ab Score 60 machen weniger als 40 % aus."+(under.length?" Hoher Score, kleines Gewicht: "+nm(under)+".":"")]);else good.push(["Starker Qualitätskern",pc(hi),"Ein großer Teil des Depots liegt in Coins ab Score 60."]);
+ if(over.length)bad.push([2,"Gewicht passt nicht zum Score",over.length+" Coins",over.map(x=>x.d.t+" ("+pc(x.d.sh)+", Score "+Math.round(x.d.sc.tot)+")").join(", ")+" sind deutlich größer, als ihr Score rechtfertigt."]);
+ if(rk>20)bad.push([3,"Hoher Anteil Risky und Tot",pc(rk),"Mehr als ein Fünftel liegt in den beiden untersten Klassen."]);else if(rk>12)bad.push([2,"Spürbarer Anteil Risky und Tot",pc(rk),"Größte: "+nm(D.filter(d=>d.g==="C"||d.g==="D").sort((a,b)=>b.v-a.v).slice(0,3))+"."]);else good.push(["Wenig Risky und Tot",pc(rk),"Die beiden untersten Klassen bleiben klein."]);
+ if(smN>=12)bad.push([2,"Viele Kleinstpositionen",smN+" Coins",smN+" Positionen unter 1 % machen zusammen nur "+pc(smS)+" aus. Sie bewegen das Depot auch bei starken Kursgewinnen kaum."]);
+ if(srt[0].sh>12||top5>50)bad.push([2,"Klumpenrisiko",pc(top5),"Die fünf größten Positionen machen "+pc(top5)+" aus, die größte ("+srt[0].t+") "+pc(srt[0].sh)+"."]);else good.push(["Kein Klumpenrisiko",pc(top5),"Top 5 bei "+pc(top5)+", größte Position "+srt[0].t+" mit "+pc(srt[0].sh)+". Rechnerisch wirkt das Depot wie "+Math.round(neff)+" gleich große Positionen."]);
+ if(fl>=10)bad.push([2,"Positionen mit dokumentierten Risiken",pc(fl),"Betroffen: "+nm(D.filter(d=>!!d.sc.fl).sort((a,b)=>b.v-a.v).slice(0,5))+". Details stehen im jeweiligen Coin-Blatt."]);
+ if(vs){if(vs.df<=-10)bad.push([3,"Depot läuft Bitcoin hinterher",sg(vs.df)+" Pkt.","In 90 Tagen Depot "+sg(vs.pr)+" %, Bitcoin "+sg(vs.br)+" % (Rückrechnung mit heutigen Mengen)."]);else if(vs.df>=10)good.push(["Depot schlägt Bitcoin",sg(vs.df)+" Pkt.","In 90 Tagen Depot "+sg(vs.pr)+" %, Bitcoin "+sg(vs.br)+" %."]);else bad.push([1,"Depot etwa gleichauf mit Bitcoin",sg(vs.df)+" Pkt.","In 90 Tagen Depot "+sg(vs.pr)+" %, Bitcoin "+sg(vs.br)+" %. Das Mehrrisiko der Altcoins wurde in diesem Zeitraum nicht belohnt."])}
+ if(dd!==null&&dd<=-40)bad.push([1,"Weit unter dem Jahreshoch",sg(dd,0)+" %","Mit heutigen Mengen läge das Depot "+sg(dd,0)+" % unter seinem Hoch der letzten 12 Monate."]);
+ if(core>=45)good.push(["Klare Ausrichtung",pc(core),"Knapp die Hälfte oder mehr liegt im Kernnarrativ."]);else bad.push([1,"Kernnarrativ unter der Hälfte",pc(core),"Der Rest verteilt sich auf andere Themen."]);
+ bad.sort((a,b)=>b[0]-a[0]);const cr=bad.filter(x=>x[0]===3).length;
+ $("ckHead").textContent=cr>=3?"Deutlicher Umbaubedarf":cr>=1?"Solide Basis mit klaren Schwachstellen":bad.filter(x=>x[0]===2).length>=3?"Ordentlich, aber mit Baustellen":"Gut aufgestellt";
+ $("ckSub").textContent=cr+" kritische und "+bad.filter(x=>x[0]===2).length+" mittlere Punkte, "+good.length+" Stärken.";
+ const kp=[["Ø Score",Math.round(avg),"von 100, gewichtet"],["Score ab 60",pc(hi),"Qualitätskern"],["Score unter 30",pc(lo),loN+" Positionen"],["Top 5",pc(top5),"Konzentration"],["Wirksame Positionen",Math.round(neff),"von "+D.length],["Gegen Bitcoin 90 T",vs?`<span class="${cls(vs.df)}">${sg(vs.df)} Pkt.</span>`:"–",vs?"Rückrechnung":"Historie fehlt noch"]];
+ $("ckKp").innerHTML=kp.map(k=>`<div class="k"><div class="l">${k[0]}</div><div class="v num">${k[1]}</div><div class="s">${k[2]}</div></div>`).join("");
+ const CC=["","#8E8E93","#FF9F0A","#FF3B30"],CL=["","Hinweis","mittel","kritisch"];
+ $("ckBad").innerHTML=bad.length?bad.map(x=>`<div class="sig"><i style="background:${CC[x[0]]}"></i><b>${x[1]}</b><span class="sv">${x[2]}<em>${CL[x[0]]}</em></span><small>${x[3]}</small></div>`).join(""):'<div class="sub">Keine Schwächen nach diesen Regeln.</div>';
+ $("ckGood").innerHTML=good.length?good.map(x=>`<div class="sig"><i style="background:#34C759"></i><b>${x[0]}</b><span class="sv">${x[1]}</span><small>${x[2]}</small></div>`).join(""):'<div class="sub">Keine Stärken nach diesen Regeln.</div>'}
 function renderPlan(){const P=Object.keys(S.plan);const pv=t=>{const d=by(t);return d?d.v:0};const pm=Math.max(...P.map(t=>pv(t)+(+S.plan[t]||0)));
  if(!$("planr").children.length)$("planr").innerHTML=P.map(t=>`<div class="a"><span><b style="font-weight:500">${t}</b>${by(t)?"":" <small style=\"color:var(--mut)\">neu</small>"}</span><label><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Zukauf ${t} in Euro</span><input id="pl-${t}" type="number" inputmode="numeric" min="0" step="50" value="${+S.plan[t]||0}"></label><div class="ab" id="pb-${t}"></div><span class="v" id="pv-${t}"></span></div>`).join("");
  let sum=0;P.forEach(t=>{const a=+S.plan[t]||0,v=pv(t);sum+=a;$("pb-"+t).innerHTML=`<div style="width:${v/pm*100}%;background:#639922;border-radius:2px 0 0 2px"></div><div style="width:${a/pm*100}%;background:#97C459;border-radius:0 2px 2px 0"></div>`;$("pv-"+t).textContent="→ "+eur(v+a,0)});
@@ -504,43 +568,43 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let nextAt=0;
 function limHit(){limUntil=nextAt=Date.now()+65000;if(navigator.onLine!==false&&GAP<20000){GAP=Math.min(20000,Math.round(GAP*1.4));S.gap=GAP;save()}bgRender()}
 async function cg(path){if(S.bgOff)throw{off:1};const w=nextAt-Date.now();if(w>0)await sleep(w);if(S.bgOff)throw{off:1};nextAt=Date.now()+GAP;let r;try{r=await fetch(API+path,{credentials:"omit",referrerPolicy:"no-referrer"})}catch(e){limHit();throw{lim:1}}if(r.status===429){limHit();throw{lim:1}}if(!r.ok)throw{st:r.status};return r.json()}
+async function ll(u){if(S.bgOff)throw{off:1};const r=await fetch(u,{credentials:"omit",referrerPolicy:"no-referrer"});if(!r.ok)throw{st:r.status};return r.json()}
 const MKK="depot-market-v1";let MK={};try{MK=JSON.parse(localStorage.getItem(MKK)||"{}")||{}}catch(e){MK={}}
 const saveM=()=>{try{localStorage.setItem(MKK,JSON.stringify(MK))}catch(e){}};
-const STB=[["tether","USDT"],["usd-coin","USDC"],["ethena-usde","USDe"],["dai","DAI"]];
 const EXB=new Set("usdt usdc dai usde usds usd1 fdusd pyusd tusd usdd usdy buidl susde susds wbtc weth steth wsteth weeth cbbtc reth lbtc solvbtc wbeth leo jitosol bnsol rseth usdtb usdf rlusd usd0 xaut paxg bsc-usd usdc.e meth ezeth cbeth".split(" "));
 let KC="bitcoin",KR="30";
 function mTasks(){const H12=24*36e5,oh=(c,d)=>({k:"o_"+c+"_"+d,ttl:d==="30"?6*36e5:H12,p:"/coins/"+c+"/ohlc?vs_currency=eur&days="+d,f:j=>{if(!Array.isArray(j))return;MK.ohlc=MK.ohlc||{};MK.ohlc[c+"_"+d]=j.filter(x=>Array.isArray(x)&&x.length>=5).map(x=>[x[0],+(+x[1]).toPrecision(6),+(+x[2]).toPrecision(6),+(+x[3]).toPrecision(6),+(+x[4]).toPrecision(6)])}});
  const sel=KR==="365"?"365":"30",oth=KC==="bitcoin"?"ethereum":"bitcoin";
  return[
- {k:"global",ttl:36e5,p:"/global",f:j=>{const d=j&&j.data;if(!d)return;const m=d.market_cap_percentage||{};const stab="usdt usdc dai usde usds usd1 fdusd pyusd usdtb rlusd tusd usdd".split(" ").reduce((a,x)=>a+(+m[x]||0),0);MK.global={btc:+m.btc||0,eth:+m.eth||0,stab,total:+(d.total_market_cap&&d.total_market_cap.usd)||0};const now=Date.now();MK.dom=(MK.dom||[]).filter(x=>now-x.t<400*864e5&&dayN(x.t)!==dayN(now));MK.dom.push({t:now,b:+(+m.btc).toFixed(2)})}},
+ {k:"global",ttl:36e5,p:"/global",f:j=>{const d=j&&j.data;if(!d)return;const m=d.market_cap_percentage||{};const stab="usdt usdc dai usde usds usd1 fdusd pyusd usdtb rlusd tusd usdd".split(" ").reduce((a,x)=>a+(+m[x]||0),0);MK.global={btc:+m.btc||0,eth:+m.eth||0,stab,total:+(d.total_market_cap&&d.total_market_cap.usd)||0,vol:+(d.total_volume&&d.total_volume.usd)||0,ch:+d.market_cap_change_percentage_24h_usd||0};const now=Date.now();if(MK.global.total>0){MK.cap=(MK.cap||[]).filter(x=>now-x.t<800*864e5&&dayN(x.t)!==dayN(now));MK.cap.push({t:now,tot:Math.round(MK.global.total/1e6),alt:Math.round(MK.global.total*(1-MK.global.btc/100)/1e6)})}MK.dom=(MK.dom||[]).filter(x=>now-x.t<400*864e5&&dayN(x.t)!==dayN(now));MK.dom.push({t:now,b:+(+m.btc).toFixed(2)})}},
  {k:"breadth",ttl:6*36e5,p:"/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=90&page=1&price_change_percentage=30d",f:j=>{if(!Array.isArray(j))return;const ch=c=>c.price_change_percentage_30d_in_currency,bt=j.find(c=>c.id==="bitcoin"),b=bt&&ch(bt)!==null?+ch(bt):null;const al=j.filter(c=>c.id!=="bitcoin"&&!EXB.has(String(c.symbol).toLowerCase())&&ch(c)!==null&&isFinite(+ch(c))).slice(0,50);if(b===null||!isFinite(b)||!al.length)return;MK.breadth={n:al.length,win:al.filter(c=>+ch(c)>b).length,btc:b}}},
  oh(KC,sel),
  {k:"ethbtc",ttl:H12,p:"/coins/ethereum/market_chart?vs_currency=btc&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.prices))MK.ethbtc=j.prices.filter(p=>p[1]>0).map(p=>[p[0],+(+p[1]).toPrecision(5)])}},
  {k:"btcH",ttl:H12,p:"/coins/bitcoin/market_chart?vs_currency=eur&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.prices))MK.btcH=j.prices.filter(p=>p[1]>0).map(p=>[dayN(p[0]),Math.round(p[1])])}},
- ...STB.map(x=>({k:"st_"+x[0],ttl:H12,p:"/coins/"+x[0]+"/market_chart?vs_currency=usd&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.market_caps)){MK.stb=MK.stb||{};MK.stb[x[0]]=j.market_caps.filter(p=>p[1]>0).map(p=>[dayN(p[0]),Math.round(p[1]/1e6)])}}})),
+ {k:"stab",ttl:H12,u:"https://stablecoins.llama.fi/stablecoins?includePrices=false",f:j=>{const a=(j&&j.peggedAssets||[]).filter(x=>x&&x.pegType==="peggedUSD"),g=(x,k)=>+(x[k]&&x[k].peggedUSD)||0;if(!a.length)return;const tot=a.reduce((s,x)=>s+g(x,"circulating"),0);if(!(tot>0))return;MK.stab={tot,d1:a.reduce((s,x)=>s+g(x,"circulatingPrevDay"),0),d7:a.reduce((s,x)=>s+g(x,"circulatingPrevWeek"),0),d30:a.reduce((s,x)=>s+g(x,"circulatingPrevMonth"),0),top:a.slice().sort((p,q)=>g(q,"circulating")-g(p,"circulating")).slice(0,5).map(x=>[String(x.symbol||"").replace(/[^A-Za-z0-9.+-]/g,"").slice(0,10),g(x,"circulating"),g(x,"circulatingPrevMonth")])}}},
+ {k:"fng",ttl:6*36e5,u:"https://api.alternative.me/fng/?limit=31",f:j=>{const a=(j&&j.data||[]).map(x=>[+x.timestamp*1000,+x.value]).filter(x=>x[0]>0&&isFinite(x[1])).sort((p,q)=>p[0]-q[0]);if(a.length)MK.fng=a}},
+ {k:"cex",ttl:6*36e5,u:"https://api.llama.fi/cexs",f:j=>{const a=(j&&j.cexs||[]).filter(x=>x&&isFinite(+x.currentTvl)&&+x.currentTvl>0),n=v=>isFinite(+v)&&v!==null?+v:0;if(!a.length)return;a.sort((p,q)=>q.currentTvl-p.currentTvl);MK.cex={n:a.length,tvl:a.reduce((s,x)=>s+ +x.currentTvl,0),i24:a.reduce((s,x)=>s+n(x.inflows_24h),0),i7:a.reduce((s,x)=>s+n(x.inflows_1w),0),i30:a.reduce((s,x)=>s+n(x.inflows_1m),0),oi:a.reduce((s,x)=>s+n(x.oi),0),top:a.slice(0,5).map(x=>[String(x.name||"").replace(/[^A-Za-z0-9 .+-]/g,"").slice(0,18),+x.currentTvl,n(x.inflows_1w),n(x.inflows_1m)])}}},
  oh(KC,sel==="30"?"365":"30"),oh(oth,"30"),oh(oth,"365")]}
 const mNeed=()=>{const at=MK.at||{},now=Date.now();return mTasks().filter(t=>!at[t.k]||now-at[t.k]>t.ttl)};
 let mBusy=false;
 function mProg(n,paused){$("mprog").hidden=!n;$("mptxt").textContent=n?(paused?(navigator.onLine===false?"Marktdaten pausiert – offline":"Marktdaten pausieren kurz – CoinGecko-Limit, geht in etwa einer Minute weiter"):"Marktdaten werden geladen, noch "+n+" Abruf"+(n>1?"e":"")):""}
 async function mRun(){if(mBusy||!D.length||S.bgOff)return;mBusy=true;MK.at=MK.at||{};let fails=0;
  for(;;){const n=mNeed();if(!n.length)break;const t=n[0];mProg(n.length);
-  try{const j=await cg(t.p);t.f(j);MK.at[t.k]=Date.now();saveM();renderMarket();bgRender()}
-  catch(e){if(e&&e.off)break;if(e&&e.st){MK.at[t.k]=Date.now();saveM()}else{fails++;mProg(n.length,true);if(fails>8||navigator.onLine===false)break}}}
+  try{const j=t.u?await ll(t.u):await cg(t.p);t.f(j);MK.at[t.k]=Date.now();saveM();renderMarket();if(t.k==="btcH")render();bgRender()}
+  catch(e){if(e&&e.off)break;if(t.u){MK.at[t.k]=Date.now()-t.ttl+6e5;saveM();continue}if(e&&e.st){MK.at[t.k]=Date.now();saveM()}else{fails++;mProg(n.length,true);if(fails>8||navigator.onLine===false)break}}}
  mBusy=false;mProg(0);renderMarket();bgRender()}
-function stabSeries(){const S0=MK.stb||{},ids=STB.map(x=>x[0]).filter(id=>S0[id]&&S0[id].length>1);if(!ids.length)return null;const d0=Math.max(...ids.map(id=>S0[id][0][0])),d1=Math.min(...ids.map(id=>S0[id][S0[id].length-1][0]));if(d1<=d0)return null;const maps=ids.map(id=>new Map(S0[id])),last=ids.map(()=>0),pts=[];
- for(let k=d0;k<=d1;k++){let v=0;maps.forEach((m,i)=>{if(m.has(k))last[i]=m.get(k);v+=last[i]});pts.push({t:k*864e5,v:v/1000})}return{pts,names:STB.filter(x=>ids.includes(x[0])).map(x=>x[1])}}
 function signals(){const o=[],G=MK.global,now=Date.now();
- {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";if(G){val=pc(G.btc);const c=(MK.dom||[]).filter(x=>now-x.t>=6*864e5&&now-x.t<=35*864e5).sort((a,b)=>a.t-b.t)[0];if(c){const df=G.btc-c.b;st=df<=-1.5?1:df>=1.5?3:2;txt=sg(df)+" Punkte seit "+new Date(c.t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+". Fallende Dominanz spricht für Altcoins."}else txt="Der Trend wird ab jetzt mitgeschrieben. Eine Aussage gibt es nach etwa einer Woche."}o.push(["Bitcoin-Dominanz",val,st,txt])}
- {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const e=MK.ethbtc;if(e&&e.length>32){const l=e[e.length-1][1],p=e[e.length-31][1],ch=(l/p-1)*100,ma=e.slice(-200).reduce((a,x)=>a+x[1],0)/Math.min(200,e.length);val=l.toLocaleString("de-DE",{minimumFractionDigits:4,maximumFractionDigits:4});st=ch>=5?1:ch<=-5?3:2;txt=sg(ch)+" % in 30 Tagen, "+(l>=ma?"über":"unter")+" dem 200-Tage-Schnitt."}o.push(["ETH gegen BTC",val,st,txt])}
- {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const s=stabSeries();if(s&&s.pts.length>31){const l=s.pts[s.pts.length-1].v,p=s.pts[s.pts.length-31].v,ch=(l/p-1)*100;val=l.toLocaleString("de-DE",{maximumFractionDigits:1})+" Mrd. $";st=ch>=2?1:ch<=-1?3:2;txt=sg(ch)+" % in 30 Tagen ("+s.names.join(", ")+"). Wachstum heißt frisches Geld im Markt."}o.push(["Stablecoin-Menge",val,st,txt])}
- {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const b=MK.breadth;if(b&&b.n){const sh=b.win/b.n*100;val=pc(sh,0);st=sh>=75?1:sh<=25?3:2;txt=b.win+" von "+b.n+" großen Altcoins liefen in 30 Tagen besser als Bitcoin ("+sg(b.btc)+" %)."}o.push(["Altcoin-Breite",val,st,txt])}
- {let st=0,val="–",txt="Braucht die Kurshistorie deines Depots und von Bitcoin.";const hs=hSeries(30),bh=MK.btcH;if(hs&&bh&&bh.length>31){const T=hs.pts[hs.pts.length-1].v,pr=(T/hs.pts[0].v-1)*100,br=(bh[bh.length-1][1]/bh[bh.length-31][1]-1)*100,df=pr-br;val=sg(df)+" Pkt.";st=df>=5?1:df<=-5?3:2;txt="Depot "+sg(pr)+" %, Bitcoin "+sg(br)+" % in 30 Tagen (Rückrechnung mit heutigen Mengen)."}o.push(["Depot gegen Bitcoin",val,st,txt])}
+ {let st=0,sc=null,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";if(G){val=pc(G.btc);const c=(MK.dom||[]).filter(x=>now-x.t>=6*864e5&&now-x.t<=35*864e5).sort((a,b)=>a.t-b.t)[0];if(c){const df=G.btc-c.b;st=df<=-1.5?1:df>=1.5?3:2;sc=50-df/3*50;txt=sg(df)+" Punkte seit "+new Date(c.t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+". Fallende Dominanz spricht für Altcoins."}else txt="Der Trend wird ab jetzt mitgeschrieben. Eine Aussage gibt es nach etwa einer Woche."}o.push(["Bitcoin-Dominanz",val,st,txt,sc])}
+ {let st=0,sc=null,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const e=MK.ethbtc;if(e&&e.length>32){const l=e[e.length-1][1],p=e[e.length-31][1],ch=(l/p-1)*100,ma=e.slice(-200).reduce((a,x)=>a+x[1],0)/Math.min(200,e.length);val=l.toLocaleString("de-DE",{minimumFractionDigits:4,maximumFractionDigits:4});st=ch>=5?1:ch<=-5?3:2;sc=50+ch/10*50;txt=sg(ch)+" % in 30 Tagen, "+(l>=ma?"über":"unter")+" dem 200-Tage-Schnitt."}o.push(["ETH gegen BTC",val,st,txt,sc])}
+ {let st=0,sc=null,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const b=MK.stab;if(b&&b.tot>0&&b.d30>0){const ch=(b.tot/b.d30-1)*100;val=(b.tot/1e9).toLocaleString("de-DE",{maximumFractionDigits:1})+" Mrd. $";st=ch>=2?1:ch<=-1?3:2;sc=50+ch/4*50;txt=sg(ch)+" % in 30 Tagen (alle Dollar-Stablecoins, DefiLlama). Wachstum heißt frisches Geld im Markt."}o.push(["Stablecoin-Menge",val,st,txt,sc])}
+ {let st=0,sc=null,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const b=MK.breadth;if(b&&b.n){const sh=b.win/b.n*100;val=pc(sh,0);st=sh>=75?1:sh<=25?3:2;sc=sh;txt=b.win+" von "+b.n+" großen Altcoins liefen in 30 Tagen besser als Bitcoin ("+sg(b.btc)+" %)."}o.push(["Altcoin-Breite",val,st,txt,sc])}
+ {let st=0,sc=null,val="–",txt="Braucht die Kurshistorie deines Depots und von Bitcoin.";const hs=hSeries(30),bh=MK.btcH;if(hs&&bh&&bh.length>31){const T=hs.pts[hs.pts.length-1].v,pr=(T/hs.pts[0].v-1)*100,br=(bh[bh.length-1][1]/bh[bh.length-31][1]-1)*100,df=pr-br;val=sg(df)+" Pkt.";st=df>=5?1:df<=-5?3:2;sc=50+df/10*50;txt="Depot "+sg(pr)+" %, Bitcoin "+sg(br)+" % in 30 Tagen (Rückrechnung mit heutigen Mengen)."}o.push(["Depot gegen Bitcoin",val,st,txt,sc])}
  return o}
 const SC=["#8E8E93","#34C759","#FF9F0A","#FF3B30"],SL=["offen","spricht dafür","neutral","spricht dagegen"];
 function miniPlot(id,pts,fy,col){const s=$(id),W=s.clientWidth,H=s.clientHeight;if(!pts||pts.length<2||!W){s.innerHTML="";return}
  const vs=pts.map(p=>p.v),ax=nice(Math.min(...vs),Math.max(...vs),3),G=58,pt=8,pb=20,pw=W-G,ph=H-pt-pb,t0=pts[0].t,t1=pts[pts.length-1].t,x=t=>(t-t0)/((t1-t0)||1)*pw,y=v=>pt+(ax.hi-v)/((ax.hi-ax.lo)||1)*ph,bot=(pt+ph).toFixed(1);
  let g=`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`+ax.t.map(v=>`<line x1="0" x2="${pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${W-2}" y="${(y(v)+3.5).toFixed(1)}" text-anchor="end">${fy(v,ax.stp)}</text>`).join("");
- g+=[0,1,2].map(i=>`<text x="${(i/2*pw).toFixed(1)}" y="${H-5}" text-anchor="${i===0?"start":i===2?"end":"middle"}">${new Date(t0+(t1-t0)*i/2).toLocaleDateString("de-DE",{month:"short",year:"2-digit"})}</text>`).join("");
+ g+=[0,1,2].map(i=>`<text x="${(i/2*pw).toFixed(1)}" y="${H-5}" text-anchor="${i===0?"start":i===2?"end":"middle"}">${new Date(t0+(t1-t0)*i/2).toLocaleDateString("de-DE",t1-t0>200*864e5?{month:"short",year:"2-digit"}:{day:"2-digit",month:"2-digit"})}</text>`).join("");
  const dp="M"+pts.map(p=>x(p.t).toFixed(1)+","+y(p.v).toFixed(1)).join(" L");
  s.innerHTML=g+`<path d="${dp} L${pw.toFixed(1)},${bot} L0,${bot} Z" fill="url(#g${id})"/><path d="${dp}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(t1).toFixed(1)}" cy="${y(vs[vs.length-1]).toFixed(1)}" r="3.5" fill="${col}"/>`}
 function candles(){const o=MK.ohlc&&MK.ohlc[KC+"_"+(KR==="365"?"365":"30")];if(!o||!o.length)return null;if(KR==="365")return o;if(KR==="7")return o.slice(-42);
@@ -564,16 +628,25 @@ function kTouch(e){if(!KD)return;const r=$("kChart").getBoundingClientRect(),i=M
  const d=new Date(k[0]);$("kInfo").innerHTML=`<span class="sub">${d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"2-digit"})}${KR==="7"?" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span> E ${kFmt(k[1])} · H ${kFmt(k[2])} · T ${kFmt(k[3])} · S <span class="${cls(k[4]-k[1])}">${kFmt(k[4])}</span>`}
 function kLeave(){const ln=document.getElementById("kx");if(ln)ln.setAttribute("visibility","hidden");kBase()}
 function renderMarket(){const sg5=signals(),kn=sg5.filter(x=>x[2]>0),gr=kn.filter(x=>x[2]===1).length,rd=kn.filter(x=>x[2]===3).length;
- $("rHead").textContent=!kn.length?"Noch keine Marktdaten":gr>=4?"Altseason-Signale überwiegen":rd>=Math.max(3,kn.length-1)?"Bitcoin führt den Markt":gr>rd?"Leicht positiv für Altcoins":rd>gr?"Eher gegen Altcoins":"Gemischtes Bild";
- $("rSub").textContent=kn.length?gr+" von "+kn.length+" bewertbaren Signalen sprechen für Altcoins, "+rd+" dagegen."+(MK.at&&MK.at.global?" Stand "+new Date(MK.at.global).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+".":""):"Die Marktdaten laden nach dem nächsten Sync.";
+ const cmp=sg5.filter(x=>x[4]!==null&&isFinite(x[4])).map(x=>[x[0],Math.max(0,Math.min(100,x[4]))]),idx=cmp.length?cmp.reduce((a,x)=>a+x[1],0)/cmp.length:null;
+ $("asiV").textContent=idx===null?"–":Math.round(idx);$("asiM").style.left=(idx===null?50:idx)+"%";
+ $("rHead").textContent=idx===null?"Noch keine Marktdaten":idx>=75?"Altcoin-Season":idx>=58?"Tendenz zu Altcoins":idx>42?"Neutral":idx>25?"Tendenz zu Bitcoin":"Bitcoin-Season";
+ $("asiBars").innerHTML=sg5.map(x=>{const v=x[4]!==null&&isFinite(x[4])?Math.max(0,Math.min(100,x[4])):null,c=v===null?"":v>=50?"#34C759":"#FF9F0A";return`<div class="ab2"><span>${x[0]}</span><div class="tr">${v===null?"":`<b style="left:${Math.min(50,v)}%;width:${Math.max(1.5,Math.abs(v-50))}%;background:${c}"></b>`}<u></u></div><span>${v===null?"–":Math.round(v)}</span></div>`}).join("");
+ if(idx!==null&&cmp.length>=3){const now=Date.now(),a=MK.asi||[],l=a[a.length-1],v=Math.round(idx);if(!l||dayN(l.t)!==dayN(now)||l.v!==v){MK.asi=a.filter(x=>now-x.t<800*864e5&&dayN(x.t)!==dayN(now));MK.asi.push({t:now,v,n:cmp.length});saveM()}}
+ {const a=(MK.asi||[]).slice().sort((p,q)=>p.t-q.t),ok=a.length>=2&&document.body.dataset.view==="mkt";$("asiFig").hidden=!ok;$("asiLab").hidden=!ok;if(ok)miniPlot("aChart",a.map(p=>({t:p.t,v:p.v})),v=>v.toLocaleString("de-DE",{maximumFractionDigits:0}),"#34C759")}
+ $("rSub").textContent=kn.length?"Index aus "+cmp.length+" von 5 Signalen. "+gr+" sprechen für Altcoins, "+rd+" dagegen."+(MK.at&&MK.at.global?" Stand "+new Date(MK.at.global).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+".":""):"Die Marktdaten laden nach dem nächsten Sync.";
  $("rSig").innerHTML=sg5.map(x=>`<div class="sig"><i style="background:${SC[x[2]]}"></i><b>${x[0]}</b><span class="sv">${x[1]}<em>${SL[x[2]]}</em></span><small>${x[3]}</small></div>`).join("");
  const G=MK.global;
  if(G&&G.total){const alt=Math.max(0,100-G.btc-G.eth-G.stab),P=[["Bitcoin","#FF9F0A",G.btc],["Ethereum","#5E5CE6",G.eth],["Stablecoins (Top 10)","#30B0C7",G.stab],["Übrige Altcoins","#34C759",alt]];$("dSum").innerHTML=P.map(p=>`<div style="width:${p[2]}%;background:${p[1]}"></div>`).join("");$("dLg").innerHTML=P.map(p=>`<span><i style="background:${p[1]}"></i>${p[0]} ${pc(p[2])}</span>`).join("");$("dTot").textContent="Gesamtmarkt "+(G.total/1e12).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" Bio. $"}
  else{$("dSum").innerHTML="";$("dLg").innerHTML="";$("dTot").textContent="Marktanteile erscheinen nach dem Sync."}
  if(document.body.dataset.view!=="mkt")return;
  drawK();
- const st=stabSeries();if(st){const l=st.pts[st.pts.length-1].v,f=st.pts[0].v,ch=(l/f-1)*100;$("sInfo").innerHTML=`${l.toLocaleString("de-DE",{maximumFractionDigits:1})} Mrd. $ <span class="${cls(ch)}">${sg(ch)} %</span> <span class="sub">in 1 Jahr</span>`;$("sNote").textContent="Summe der Marktkapitalisierung von "+st.names.join(", ")+". Das ist die Geldmenge innerhalb von Krypto, vergleichbar mit M1/M2. Notenbank-Geldmengen sind nicht enthalten."}else{$("sInfo").textContent="";$("sNote").textContent="Die Stablecoin-Menge erscheint nach dem Sync."}
- miniPlot("sChart",st&&st.pts,(v)=>v.toLocaleString("de-DE",{maximumFractionDigits:0})+" Mrd.","#30B0C7");
+ const bn=v=>(Math.abs(v)>=1e12?(v/1e12).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" Bio. $":(v/1e9).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" Mrd. $"),sbn=v=>(v>=0?"+":"−")+bn(Math.abs(v)),chp=(a,b)=>b>0?`<span class="${cls(a-b)}">${sg((a/b-1)*100,2)} %</span>`:"–";
+ if(G&&G.total){const alt=G.total*(1-G.btc/100),t3=G.total*(1-(G.btc+G.eth)/100);$("capRows").innerHTML=[["Gesamtmarkt",bn(G.total),`<span class="${cls(G.ch)}">${sg(G.ch,2)} %</span> in 24 h`],["Altcoins (ohne Bitcoin)",bn(alt),pc(100-G.btc)+" des Marktes"],["Ohne Bitcoin und Ethereum",bn(t3),pc(100-G.btc-G.eth)+" des Marktes"]].concat(G.vol?[["Handelsvolumen 24 h",bn(G.vol),pc(G.vol/G.total*100)+" des Marktwerts"]]:[]).map(r=>`<div class="cr"><span>${r[0]}</span><span>${r[1]}<small>${r[2]}</small></span></div>`).join("")}else $("capRows").innerHTML='<div class="sub">Erscheint nach dem Sync.</div>';
+ {const f=MK.fng,FL=v=>v<25?"Extreme Angst":v<45?"Angst":v<=55?"Neutral":v<=75?"Gier":"Extreme Gier";if(f&&f.length){const l=f[f.length-1][1],w=f[Math.max(0,f.length-8)][1],m=f[0][1];$("fgV").textContent=l;$("fgC").textContent=FL(l);$("fgM").style.left=Math.max(0,Math.min(100,l))+"%";$("fgRows").innerHTML=[["Vor 7 Tagen",w,FL(w)],["Vor "+(f.length-1)+" Tagen",m,FL(m)]].map(r=>`<div class="cr"><span>${r[0]}</span><span>${r[1]}<small>${r[2]}</small></span></div>`).join("");miniPlot("fChart",f.map(p=>({t:p[0],v:p[1]})),v=>v.toLocaleString("de-DE",{maximumFractionDigits:0}),"#FF9F0A")}else{$("fgV").textContent="–";$("fgC").textContent="Erscheint nach dem Sync.";$("fgRows").innerHTML="";$("fChart").innerHTML=""}}
+ {const c=(MK.cap||[]).slice().sort((a,b)=>a.t-b.t),ok=c.length>=2;$("capFig").hidden=!ok;$("capLab").hidden=!ok;if(ok)miniPlot("cChart",c.map(p=>({t:p.t,v:p.alt/1000})),v=>v.toLocaleString("de-DE",{maximumFractionDigits:0})+" Mrd.","#34C759")}
+ {const b=MK.stab;$("stRows").innerHTML=b&&b.tot>0?[["Gesamt",bn(b.tot),""],["24 Stunden",sbn(b.tot-b.d1),chp(b.tot,b.d1)],["7 Tage",sbn(b.tot-b.d7),chp(b.tot,b.d7)],["30 Tage",sbn(b.tot-b.d30),chp(b.tot,b.d30)]].concat((b.top||[]).map(x=>[x[0],bn(x[1]),chp(x[1],x[2])+" in 30 T"])).map(r=>`<div class="cr"><span>${r[0]}</span><span>${r[1]}<small>${r[2]}</small></span></div>`).join(""):'<div class="sub">Erscheint nach dem Sync.</div>'}
+ {const c=MK.cex;$("cxRows").innerHTML=c&&c.tvl>0?[["Alle "+c.n+" Börsen, Bestand",bn(c.tvl),""],["Nettofluss 24 Stunden",sbn(c.i24),c.i24>=0?"Zufluss":"Abfluss"],["Nettofluss 7 Tage",sbn(c.i7),c.i7>=0?"Zufluss":"Abfluss"],["Nettofluss 30 Tage",sbn(c.i30),c.i30>=0?"Zufluss":"Abfluss"],["Open Interest (Derivate)",bn(c.oi||0),"offene Hebel-Positionen, alle Börsen"]].concat((c.top||[]).map(x=>[x[0],bn(x[1]),"30 T "+sbn(x[3])+" · 7 T "+sbn(x[2])])).map(r=>`<div class="cr"><span>${r[0]}</span><span>${r[1]}<small>${r[2]}</small></span></div>`).join(""):'<div class="sub">Erscheint nach dem Sync.</div>'}
  const e=MK.ethbtc;if(e&&e.length>1){const l=e[e.length-1][1],f=e[0][1],ch=(l/f-1)*100;$("eInfo").innerHTML=`${l.toLocaleString("de-DE",{minimumFractionDigits:4,maximumFractionDigits:4})} BTC <span class="${cls(ch)}">${sg(ch)} %</span> <span class="sub">in 1 Jahr</span>`}else $("eInfo").textContent="Erscheint nach dem Sync.";
  miniPlot("eChart",e&&e.map(p=>({t:p[0],v:p[1]})),(v,stp)=>v.toLocaleString("de-DE",{minimumFractionDigits:stp<.001?4:3,maximumFractionDigits:stp<.001?4:3}),"#5E5CE6")}
 $("kCoin").addEventListener("click",e=>{const b=e.target.closest("[data-kc]");if(b){KC=b.dataset.kc;drawK()}});
@@ -593,7 +666,7 @@ let stT=null;const st=(m,err)=>{const e=$("st");e.textContent=m;e.className="st"
 const API="https://api.coingecko.com/api/v3";
 function countUp(a,b){if(S.hide||!(a>0)||a===b||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))return;const t0=performance.now(),el=$("tot"),step=t=>{const k=Math.min(1,(t-t0)/650),e=1-Math.pow(1-k,3);el.textContent=eur(a+(b-a)*e);if(k<1)requestAnimationFrame(step);else if(HERO)el.textContent=HERO.tot};requestAnimationFrame(step)}
 const down=(a,n)=>{if(a.length<=n)return a;const o=[];for(let i=0;i<n;i++)o.push(a[Math.round(i*(a.length-1)/(n-1))]);return o};
-const MLAB={global:"Marktanteile",breadth:"Altcoin-Breite",ethbtc:"ETH gegen BTC",btcH:"Bitcoin-Historie","st_tether":"USDT-Menge","st_usd-coin":"USDC-Menge","st_ethena-usde":"USDe-Menge","st_dai":"DAI-Menge","o_bitcoin_30":"Bitcoin-Kerzen 30 T","o_bitcoin_365":"Bitcoin-Kerzen 1 J","o_ethereum_30":"Ethereum-Kerzen 30 T","o_ethereum_365":"Ethereum-Kerzen 1 J"};
+const MLAB={global:"Marktanteile",breadth:"Altcoin-Breite",ethbtc:"ETH gegen BTC",btcH:"Bitcoin-Historie",stab:"Stablecoin-Menge",cex:"Börsenflüsse",fng:"Fear & Greed","o_bitcoin_30":"Bitcoin-Kerzen 30 T","o_bitcoin_365":"Bitcoin-Kerzen 1 J","o_ethereum_30":"Ethereum-Kerzen 30 T","o_ethereum_365":"Ethereum-Kerzen 1 J"};
 let bgTimer=null;
 function bgRender(){if(!D.length)return;const hn=hNeed(),mn=mNeed(),hT=D.length,mT=mTasks().length,open=hn.length+mn.length,now=Date.now(),wait=Math.max(0,nextAt-now),lim=limUntil>now,off=!!S.bgOff,run=hBusy||mBusy||!!hTimer;
  const eta=open?Math.ceil((open*GAP+wait)/60000):0,secs=Math.ceil(wait/1000);
