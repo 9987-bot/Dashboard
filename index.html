@@ -97,6 +97,9 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 @media(prefers-reduced-motion:no-preference){.f{transition:width .4s}}
 
 /* iOS-Look */
+.bgl{display:block;border:0;background:none;padding:2px 0;margin:0;color:var(--acc);font-size:13px;font-weight:500;text-align:left}
+.bgr{display:flex;justify-content:space-between;gap:12px;font-size:15px;margin-top:12px;font-variant-numeric:tabular-nums}.bgr span:last-child{color:var(--mut)}
+.pbar>i{background:var(--acc)}
 .sig{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:12px 0;border-top:.5px solid var(--ln)}
 .sig i{width:10px;height:10px;border-radius:50%;margin-top:5px}.sig b{font-weight:600;font-size:15px}.sig .sv{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
 .sig small{grid-column:2/-1;color:var(--mut);font-size:13px;line-height:1.35}
@@ -166,7 +169,7 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 <div class="wrap">
 <div id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,13 12,19 18,13"/></svg></div>
 <div class="top" id="uebersicht">
-<div><div class="sub"><span id="npos"></span> Positionen</div><div class="tot num" id="tot">–</div><div class="d24" id="d24"></div><div class="sub" id="asof"></div></div>
+<div><div class="sub"><span id="npos"></span> Positionen</div><div class="tot num" id="tot">–</div><div class="d24" id="d24"></div><div class="sub" id="asof"></div><button type="button" class="bgl" id="bgline" hidden></button></div>
 <div class="acts"><button id="hideBtn" class="ib" type="button" aria-label="Beträge verbergen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><line class="sl" x1="4" y1="20" x2="20" y2="4"/></svg></button><button id="sync" class="ib" type="button" aria-label="Kurse synchronisieren"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><polyline points="20,4 20,8.5 15.5,8.5"/></svg></button></div>
 </div>
 <p class="st" id="st" role="status"></p>
@@ -273,6 +276,16 @@ textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
 <p class="note">Aus deinen Angaben vom 25.11.2026 übernommen, hier nicht neu geprüft.</p>
 </section>
 </div>
+<section id="syncst" data-v="data">
+<h2>Synchronisation</h2>
+<div id="bgState" style="font-weight:600"></div>
+<div class="bgr"><span>Kurse zuletzt</span><span id="bgP"></span></div>
+<div class="bgr"><span>Kurshistorie (1 Jahr je Coin)</span><span id="bgH"></span></div><div class="pbar"><i id="bgHb" style="width:0%"></i></div>
+<div class="bgr"><span>Marktdaten</span><span id="bgM"></span></div><div class="pbar"><i id="bgMb" style="width:0%"></i></div>
+<p class="note" id="bgOpen"></p>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><button class="btn" id="bgBtn" type="button">Anhalten</button><span class="sub" id="bgGap"></span></div>
+<p class="note">Die Kurse selbst kommen sofort beim Sync. Im Hintergrund lädt die App nur Zusatzdaten nach. CoinGecko erlaubt ohne Schlüssel wenige Abrufe pro Minute, deshalb der Abstand. Die Kurshistorie wird einmal geladen und danach bei jedem Sync um den aktuellen Kurs ergänzt, Marktdaten höchstens einmal täglich.</p>
+</section>
 <section id="daten" data-v="data">
 <h2>Daten</h2>
 <p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: eine Anfrage an CoinGecko mit den Coin-Namen, ohne Mengen.</p>
@@ -479,23 +492,24 @@ $("hideBtn").addEventListener("click",()=>{S.hide=!S.hide;save();render();if(SHT
 $("cm").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b){MODE=b.dataset.m;drawChart();if(/^\d+$/.test(MODE))hStart()}});
 {const c=$("chart");c.addEventListener("pointerdown",chartTouch);c.addEventListener("pointermove",chartTouch);c.addEventListener("pointerleave",chartLeave);c.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")setTimeout(chartLeave,1500)});c.addEventListener("pointercancel",chartLeave)}
 const VT={home:"Übersicht",pos:"Positionen",mkt:"Markt",ana:"Analyse",data:"Daten"};
-function setView(v){if(!VT[v])v="home";document.body.dataset.view=v;$("barT").textContent=VT[v]||"";closeSheet();$("tabs").querySelectorAll("[data-tab]").forEach(b=>{if(b.dataset.tab===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});try{sessionStorage.setItem("depot-view",v)}catch(e){}window.scrollTo(0,0);if(v==="home")drawChart();if(v==="mkt")renderMarket()}
+function setView(v){if(!VT[v])v="home";document.body.dataset.view=v;$("barT").textContent=VT[v]||"";closeSheet();$("tabs").querySelectorAll("[data-tab]").forEach(b=>{if(b.dataset.tab===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});try{sessionStorage.setItem("depot-view",v)}catch(e){}window.scrollTo(0,0);if(v==="home")drawChart();if(v==="mkt")renderMarket();if(v==="data")bgRender()}
 $("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)setView(b.dataset.tab)});
 $("goData").addEventListener("click",()=>setView("data"));
-const ALT={CLEAR:"clearpool"},GAP=7000;let hBusy=false,hTimer=null;
-const hNeed=()=>{const now=Date.now();return D.filter(d=>!PH[d.t]||now-PH[d.t].at>864e5).sort((a,b)=>b.v-a.v)};
+const ALT={CLEAR:"clearpool"};let GAP=Math.max(8000,Math.min(20000,+S.gap||8000)),hBusy=false,hTimer=null,limUntil=0;
+const hNeed=()=>{const now=Date.now();return D.filter(d=>!PH[d.t]||now-PH[d.t].at>14*864e5).sort((a,b)=>b.v-a.v)};
 function hProg(msg){const need=hNeed().length,done=D.length-need;$("hprog").hidden=!need&&!msg;$("hptxt").textContent=msg||("Kurshistorie: "+done+" von "+D.length+" Coins geladen");$("hpbar").style.width=(D.length?done/D.length*100:0)+"%"}
 async function hFetch(id){const j=await cg("/coins/"+id+"/market_chart?vs_currency=eur&days=365&interval=daily"),m=new Map();(j&&Array.isArray(j.prices)?j.prices:[]).forEach(p=>{const v=Number(p&&p[1]);if(v>0)m.set(dayN(Number(p[0])),+v.toPrecision(6))});return m}
 function dense(m){const ks=[...m.keys()].sort((a,b)=>a-b);if(!ks.length)return null;const d0=ks[0],p=[];let last=m.get(d0);for(let k=d0;k<=ks[ks.length-1];k++){if(m.has(k))last=m.get(k);p.push(last)}return{d0,p}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let nextAt=0;
-async function cg(path){const w=nextAt-Date.now();if(w>0)await sleep(w);nextAt=Date.now()+GAP;let r;try{r=await fetch(API+path,{credentials:"omit",referrerPolicy:"no-referrer"})}catch(e){nextAt=Date.now()+65000;throw{lim:1}}if(r.status===429){nextAt=Date.now()+65000;throw{lim:1}}if(!r.ok)throw{st:r.status};return r.json()}
+function limHit(){limUntil=nextAt=Date.now()+65000;if(navigator.onLine!==false&&GAP<20000){GAP=Math.min(20000,Math.round(GAP*1.4));S.gap=GAP;save()}bgRender()}
+async function cg(path){if(S.bgOff)throw{off:1};const w=nextAt-Date.now();if(w>0)await sleep(w);if(S.bgOff)throw{off:1};nextAt=Date.now()+GAP;let r;try{r=await fetch(API+path,{credentials:"omit",referrerPolicy:"no-referrer"})}catch(e){limHit();throw{lim:1}}if(r.status===429){limHit();throw{lim:1}}if(!r.ok)throw{st:r.status};return r.json()}
 const MKK="depot-market-v1";let MK={};try{MK=JSON.parse(localStorage.getItem(MKK)||"{}")||{}}catch(e){MK={}}
 const saveM=()=>{try{localStorage.setItem(MKK,JSON.stringify(MK))}catch(e){}};
 const STB=[["tether","USDT"],["usd-coin","USDC"],["ethena-usde","USDe"],["dai","DAI"]];
 const EXB=new Set("usdt usdc dai usde usds usd1 fdusd pyusd tusd usdd usdy buidl susde susds wbtc weth steth wsteth weeth cbbtc reth lbtc solvbtc wbeth leo jitosol bnsol rseth usdtb usdf rlusd usd0 xaut paxg bsc-usd usdc.e meth ezeth cbeth".split(" "));
 let KC="bitcoin",KR="30";
-function mTasks(){const H12=12*36e5,oh=(c,d)=>({k:"o_"+c+"_"+d,ttl:d==="30"?3*36e5:H12,p:"/coins/"+c+"/ohlc?vs_currency=eur&days="+d,f:j=>{if(!Array.isArray(j))return;MK.ohlc=MK.ohlc||{};MK.ohlc[c+"_"+d]=j.filter(x=>Array.isArray(x)&&x.length>=5).map(x=>[x[0],+(+x[1]).toPrecision(6),+(+x[2]).toPrecision(6),+(+x[3]).toPrecision(6),+(+x[4]).toPrecision(6)])}});
+function mTasks(){const H12=24*36e5,oh=(c,d)=>({k:"o_"+c+"_"+d,ttl:d==="30"?6*36e5:H12,p:"/coins/"+c+"/ohlc?vs_currency=eur&days="+d,f:j=>{if(!Array.isArray(j))return;MK.ohlc=MK.ohlc||{};MK.ohlc[c+"_"+d]=j.filter(x=>Array.isArray(x)&&x.length>=5).map(x=>[x[0],+(+x[1]).toPrecision(6),+(+x[2]).toPrecision(6),+(+x[3]).toPrecision(6),+(+x[4]).toPrecision(6)])}});
  const sel=KR==="365"?"365":"30",oth=KC==="bitcoin"?"ethereum":"bitcoin";
  return[
  {k:"global",ttl:36e5,p:"/global",f:j=>{const d=j&&j.data;if(!d)return;const m=d.market_cap_percentage||{};const stab="usdt usdc dai usde usds usd1 fdusd pyusd usdtb rlusd tusd usdd".split(" ").reduce((a,x)=>a+(+m[x]||0),0);MK.global={btc:+m.btc||0,eth:+m.eth||0,stab,total:+(d.total_market_cap&&d.total_market_cap.usd)||0};const now=Date.now();MK.dom=(MK.dom||[]).filter(x=>now-x.t<400*864e5&&dayN(x.t)!==dayN(now));MK.dom.push({t:now,b:+(+m.btc).toFixed(2)})}},
@@ -508,11 +522,11 @@ function mTasks(){const H12=12*36e5,oh=(c,d)=>({k:"o_"+c+"_"+d,ttl:d==="30"?3*36
 const mNeed=()=>{const at=MK.at||{},now=Date.now();return mTasks().filter(t=>!at[t.k]||now-at[t.k]>t.ttl)};
 let mBusy=false;
 function mProg(n,paused){$("mprog").hidden=!n;$("mptxt").textContent=n?(paused?(navigator.onLine===false?"Marktdaten pausiert – offline":"Marktdaten pausieren kurz – CoinGecko-Limit, geht in etwa einer Minute weiter"):"Marktdaten werden geladen, noch "+n+" Abruf"+(n>1?"e":"")):""}
-async function mRun(){if(mBusy||!D.length)return;mBusy=true;MK.at=MK.at||{};let fails=0;
+async function mRun(){if(mBusy||!D.length||S.bgOff)return;mBusy=true;MK.at=MK.at||{};let fails=0;
  for(;;){const n=mNeed();if(!n.length)break;const t=n[0];mProg(n.length);
-  try{const j=await cg(t.p);t.f(j);MK.at[t.k]=Date.now();saveM();renderMarket()}
-  catch(e){if(e&&e.st){MK.at[t.k]=Date.now();saveM()}else{fails++;mProg(n.length,true);if(fails>8||navigator.onLine===false)break}}}
- mBusy=false;mProg(0);renderMarket()}
+  try{const j=await cg(t.p);t.f(j);MK.at[t.k]=Date.now();saveM();renderMarket();bgRender()}
+  catch(e){if(e&&e.off)break;if(e&&e.st){MK.at[t.k]=Date.now();saveM()}else{fails++;mProg(n.length,true);if(fails>8||navigator.onLine===false)break}}}
+ mBusy=false;mProg(0);renderMarket();bgRender()}
 function stabSeries(){const S0=MK.stb||{},ids=STB.map(x=>x[0]).filter(id=>S0[id]&&S0[id].length>1);if(!ids.length)return null;const d0=Math.max(...ids.map(id=>S0[id][0][0])),d1=Math.min(...ids.map(id=>S0[id][S0[id].length-1][0]));if(d1<=d0)return null;const maps=ids.map(id=>new Map(S0[id])),last=ids.map(()=>0),pts=[];
  for(let k=d0;k<=d1;k++){let v=0;maps.forEach((m,i)=>{if(m.has(k))last[i]=m.get(k);v+=last[i]});pts.push({t:k*864e5,v:v/1000})}return{pts,names:STB.filter(x=>ids.includes(x[0])).map(x=>x[1])}}
 function signals(){const o=[],G=MK.global,now=Date.now();
@@ -565,20 +579,36 @@ function renderMarket(){const sg5=signals(),kn=sg5.filter(x=>x[2]>0),gr=kn.filte
 $("kCoin").addEventListener("click",e=>{const b=e.target.closest("[data-kc]");if(b){KC=b.dataset.kc;drawK()}});
 $("kRng").addEventListener("click",e=>{const b=e.target.closest("[data-kr]");if(b){KR=b.dataset.kr;drawK()}});
 {const c=$("kChart");c.addEventListener("pointerdown",kTouch);c.addEventListener("pointermove",kTouch);c.addEventListener("pointerleave",kLeave);c.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")setTimeout(kLeave,2500)});c.addEventListener("pointercancel",kLeave)}
-async function hStep(){hTimer=null;if(hBusy)return;const need=hNeed();if(!need.length){hProg();render();return}hBusy=true;const d=need[0];let delay=GAP;
+async function hStep(){hTimer=null;if(hBusy||S.bgOff)return;const need=hNeed();if(!need.length){hProg();render();return}hBusy=true;const d=need[0];let delay=GAP;
  try{const m=await hFetch(d.id);const today=dayN(Date.now());
   if(ALT[d.t]&&m.size&&Math.min(...m.keys())>today-360){await sleep(GAP);const first=Math.min(...m.keys());try{const m2=await hFetch(ALT[d.t]);m2.forEach((v,k)=>{if(k<first)m.set(k,v)})}catch(e){if(!e||!e.st)throw e}}
   const dn=dense(m);PH[d.t]=dn?{d0:dn.d0,p:dn.p,at:Date.now()}:{d0:today,p:[],at:Date.now()};saveH()}
- catch(e){if(e&&e.st){PH[d.t]={d0:dayN(Date.now()),p:[],at:Date.now()};saveH()}else delay=65000}
- hBusy=false;const left=hNeed().length;hProg(left&&delay>GAP?(navigator.onLine===false?"Kurshistorie pausiert – offline":"Kurshistorie pausiert kurz – CoinGecko-Limit, geht in etwa einer Minute weiter"):"");drawChart();
+ catch(e){if(e&&e.off){hBusy=false;bgRender();return}if(e&&e.st){PH[d.t]={d0:dayN(Date.now()),p:[],at:Date.now()};saveH()}else delay=Math.max(1000,nextAt-Date.now())}
+ hBusy=false;bgRender();const left=hNeed().length;hProg(left&&delay>GAP?(navigator.onLine===false?"Kurshistorie pausiert – offline":"Kurshistorie pausiert kurz – CoinGecko-Limit, geht in etwa einer Minute weiter"):"");drawChart();
  if(left)hTimer=setTimeout(hStep,delay);else render()}
-function hStart(){if(!D.length||hBusy||hTimer||!hNeed().length)return;hProg();hTimer=setTimeout(hStep,400)}
+function hStart(){if(!D.length||S.bgOff||hBusy||hTimer||!hNeed().length)return;hProg();hTimer=setTimeout(hStep,400)}
 function putSnap(sn){const k=hkey(sn.t);const i=HIST.findIndex(x=>x&&hkey(x.t)===k);if(i>=0)HIST[i]=sn;else HIST.push(sn)}
 function saveSnap(T){putSnap({t:Date.now(),v:+T.toFixed(2)});S.hist=hist().slice(-1500);save();drawChart()}
 let stT=null;const st=(m,err)=>{const e=$("st");e.textContent=m;e.className="st"+(m?" on":"")+(err?" err":"");clearTimeout(stT);if(m&&!/…$/.test(m))stT=setTimeout(()=>{e.className="st"+(err?" err":"")},err?8000:4500)};
 const API="https://api.coingecko.com/api/v3";
 function countUp(a,b){if(S.hide||!(a>0)||a===b||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))return;const t0=performance.now(),el=$("tot"),step=t=>{const k=Math.min(1,(t-t0)/650),e=1-Math.pow(1-k,3);el.textContent=eur(a+(b-a)*e);if(k<1)requestAnimationFrame(step);else if(HERO)el.textContent=HERO.tot};requestAnimationFrame(step)}
 const down=(a,n)=>{if(a.length<=n)return a;const o=[];for(let i=0;i<n;i++)o.push(a[Math.round(i*(a.length-1)/(n-1))]);return o};
+const MLAB={global:"Marktanteile",breadth:"Altcoin-Breite",ethbtc:"ETH gegen BTC",btcH:"Bitcoin-Historie","st_tether":"USDT-Menge","st_usd-coin":"USDC-Menge","st_ethena-usde":"USDe-Menge","st_dai":"DAI-Menge","o_bitcoin_30":"Bitcoin-Kerzen 30 T","o_bitcoin_365":"Bitcoin-Kerzen 1 J","o_ethereum_30":"Ethereum-Kerzen 30 T","o_ethereum_365":"Ethereum-Kerzen 1 J"};
+let bgTimer=null;
+function bgRender(){if(!D.length)return;const hn=hNeed(),mn=mNeed(),hT=D.length,mT=mTasks().length,open=hn.length+mn.length,now=Date.now(),wait=Math.max(0,nextAt-now),lim=limUntil>now,off=!!S.bgOff,run=hBusy||mBusy||!!hTimer;
+ const eta=open?Math.ceil((open*GAP+wait)/60000):0,secs=Math.ceil(wait/1000);
+ const state=!open?"Alles aktuell.":off?"Angehalten. "+open+" Abrufe offen.":navigator.onLine===false?"Offline. "+open+" Abrufe offen.":lim?"Pause wegen CoinGecko-Limit, weiter in "+secs+" s. Noch etwa "+eta+" Min.":run?"Lädt. Noch "+open+" Abrufe, etwa "+eta+" Min.":"Wartet auf den nächsten Sync. "+open+" Abrufe offen.";
+ $("bgState").textContent=state;
+ $("bgP").textContent=S.at?new Date(S.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}):"noch nie";
+ $("bgH").textContent=(hT-hn.length)+" von "+hT;$("bgHb").style.width=(hT?(hT-hn.length)/hT*100:0)+"%";
+ $("bgM").textContent=(mT-mn.length)+" von "+mT;$("bgMb").style.width=(mT?(mT-mn.length)/mT*100:0)+"%";
+ const names=mn.map(t=>MLAB[t.k]||t.k).concat(hn.slice(0,10).map(d=>d.t));$("bgOpen").textContent=open?"Offen: "+names.join(", ")+(hn.length>10?" und "+(hn.length-10)+" weitere Coins":""):"";
+ $("bgGap").textContent="Abstand zwischen Abrufen: "+Math.round(GAP/1000)+" s";
+ $("bgBtn").textContent=off?"Fortsetzen":"Anhalten";$("bgBtn").hidden=!open;
+ const bl=$("bgline");bl.hidden=!open||(!run&&!off&&!lim);bl.textContent=off?"Hintergrunddaten angehalten · "+open+" offen":lim?"Hintergrunddaten: Pause "+secs+" s · "+open+" offen":"Hintergrunddaten laden · noch "+open;
+ if(open&&(run||lim)&&!off){if(!bgTimer)bgTimer=setInterval(bgRender,1000)}else if(bgTimer){clearInterval(bgTimer);bgTimer=null}}
+$("bgBtn").addEventListener("click",()=>{S.bgOff=!S.bgOff;save();if(!S.bgOff){hStart();mRun()}else if(hTimer){clearTimeout(hTimer);hTimer=null}bgRender()});
+$("bgline").addEventListener("click",()=>setView("data"));
 async function sync(){const b=$("sync");if(!D.length){st("Erst Bestände importieren.",true);return}b.disabled=true;st("Lade Kurse …");
  try{const ids=D.map(d=>d.id).join(",");
   const [fr,mr]=await Promise.all([fetch(API+"/simple/price?ids=tether&vs_currencies=eur,usd",{cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"}),fetch(API+"/coins/markets?vs_currency=usd&ids="+encodeURIComponent(ids)+"&per_page=250&page=1&sparkline=true&price_change_percentage=24h",{cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"})]);
@@ -593,7 +623,8 @@ async function sync(){const b=$("sync");if(!D.length){st("Erst Bestände importi
     const sp=c.sparkline_in_7d&&Array.isArray(c.sparkline_in_7d.price)?c.sparkline_in_7d.price.map(Number).filter(x=>x>0):[];if(sp.length>1)S.spark[d.t]=down(sp,48).map(x=>+x.toPrecision(5));else delete S.spark[d.t]}
    else miss.push(d.t)});
   if(!n){st("Keine Kurse erhalten.",true);return}
-  const oldT=TT;S.at=Date.now();S.fx=rate;save();render();countUp(oldT,TT);saveSnap(D.reduce((a,d)=>a+d.v,0));nextAt=Date.now()+GAP;setTimeout(hStart,GAP);setTimeout(mRun,600);
+  const oldT=TT;S.at=Date.now();S.fx=rate;save();render();countUp(oldT,TT);saveSnap(D.reduce((a,d)=>a+d.v,0));{const td=dayN(Date.now());D.forEach(d=>{const h=PH[d.t];if(h&&h.p&&h.p.length&&d.p>0){const i=td-h.d0;if(i>=0&&i<800){while(h.p.length<i)h.p.push(h.p[h.p.length-1]);h.p[i]=+d.p.toPrecision(6);while(h.p.length>400){h.p.shift();h.d0++}}}});saveH()}
+  nextAt=Date.now()+GAP;setTimeout(hStart,GAP);setTimeout(mRun,600);bgRender();
   st(n+" von "+D.length+" Kursen aktualisiert · EUR/USD "+(1/rate).toFixed(4).replace(".",",")+"."+(miss.length?" Ohne Kurs (alter Wert bleibt): "+miss.join(", ")+".":""),!!miss.length);
  }catch(e){st(navigator.onLine===false?"Offline – der Sync braucht Internet.":"Abruf fehlgeschlagen – später erneut versuchen.",true)}finally{b.disabled=false}}
 $("sync").addEventListener("click",sync);
@@ -609,7 +640,7 @@ $("imp").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0]
 $("pasteBtn").addEventListener("click",()=>{const v=$("box").value.trim();if(!v){dmsg("Erst JSON in das Feld einfügen.",true);return}doImport(v)});
 $("expBtn").addEventListener("click",async()=>{const txt=JSON.stringify({app:"depot-backup",at:new Date().toISOString(),state:S});$("box").value=txt;try{await navigator.clipboard.writeText(txt);dmsg("Backup steht im Feld und in der Zwischenablage. In Notizen oder Dateien sichern.")}catch(e){dmsg("Backup steht im Feld – markieren und kopieren.")}});
 let wipe=0;$("wipeBtn").addEventListener("click",()=>{if(Date.now()-wipe<4000){try{localStorage.removeItem(LS);localStorage.removeItem(HK);localStorage.removeItem(MKK)}catch(e){}location.reload()}else{wipe=Date.now();dmsg("Zum Löschen aller lokalen Daten innerhalb von 4 Sekunden erneut tippen.",true)}});
-render();
+render();bgRender();
 {let v="home";try{v=sessionStorage.getItem("depot-view")||"home"}catch(e){}setView(D.length?v:"home")}
 const ro=new ResizeObserver(drawChart);ro.observe($("chart"));const ro2=new ResizeObserver(()=>{if(document.body.dataset.view==="mkt")renderMarket()});ro2.observe($("kChart"));
 if("IntersectionObserver" in window)new IntersectionObserver(es=>{$("bar").classList.toggle("on",!es[0].isIntersecting)},{rootMargin:"-40px 0px 0px 0px"}).observe($("tot"));
