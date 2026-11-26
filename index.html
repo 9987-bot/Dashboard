@@ -13,7 +13,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Depot">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#06222e">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <style>
 /* VOICE: nüchternes Finanz-Tool, Zahl zuerst
    IDEA: Depotauszug mit Ampel-Gruppen, wie ein Broker-Report
@@ -55,7 +56,7 @@ h2{font-size:16px;font-weight:600;margin:0 0 8px}
 .tabs button{flex:1;min-height:54px;border:0;background:none;color:var(--mut);font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
 .tabs button[aria-current=page]{color:var(--ink);font-weight:600}
 .tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:not([data-v=pos]),body[data-view=ana] [data-v]:not([data-v=ana]),body[data-view=plan] [data-v]:not([data-v=plan]),body[data-view=data] [data-v]:not([data-v=data]){display:none}
+body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:not([data-v=pos]),body[data-view=ana] [data-v]:not([data-v=ana]),body[data-view=mkt] [data-v]:not([data-v=mkt]),body[data-view=data] [data-v]:not([data-v=data]){display:none}
 .gd{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
 .stale{color:var(--dn)}
 .pbar{height:4px;border-radius:2px;background:var(--soft);overflow:hidden;margin-top:6px}.pbar>i{display:block;height:4px;background:var(--mut)}
@@ -94,22 +95,89 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 .ev .d{font-variant-numeric:tabular-nums;white-space:nowrap}.ev small{color:var(--mut);display:block}
 .note{font-size:11px;color:var(--mut);margin:8px 0 0}
 @media(prefers-reduced-motion:no-preference){.f{transition:width .4s}}
+
+/* iOS-Look */
+.sig{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:12px 0;border-top:.5px solid var(--ln)}
+.sig i{width:10px;height:10px;border-radius:50%;margin-top:5px}.sig b{font-weight:600;font-size:15px}.sig .sv{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.sig small{grid-column:2/-1;color:var(--mut);font-size:13px;line-height:1.35}
+.sig em{font-style:normal;font-size:12px;color:var(--mut);display:block;text-align:right}
+.rh{font-size:17px;font-weight:700;margin:0 0 4px}.fig.sm{height:170px}
+:root{--bg:light-dark(#F2F2F7,#000000);--card:light-dark(#FFFFFF,#1C1C1E);--ink:light-dark(#000000,#FFFFFF);--mut:light-dark(#6C6C70,#98989F);--ln:light-dark(rgba(60,60,67,.14),rgba(84,84,88,.55));--soft:light-dark(#EEEEF0,#2C2C2E);--fill:light-dark(rgba(118,118,128,.12),rgba(118,118,128,.24));--segOn:light-dark(#FFFFFF,#636366);--up:light-dark(#248A3D,#30D158);--dn:light-dark(#D70015,#FF453A);--acc:light-dark(#007AFF,#0A84FF)}
+body{font:15px/1.45 -apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+h1,h2,.num{font-family:ui-rounded,-apple-system,system-ui,sans-serif}
+h2{font-size:20px;font-weight:700;letter-spacing:-.2px;margin:0 0 10px}
+.wrap{padding-top:calc(10px + env(safe-area-inset-top))}
+.top{align-items:flex-start;flex-wrap:nowrap}
+.tot{font-size:clamp(34px,10vw,46px);font-weight:700;letter-spacing:-.8px}
+.d24{font-size:15px;font-weight:600}
+.sub{font-size:13px}
+.acts{display:flex;gap:8px;flex:none}
+.ib{width:40px;height:40px;min-height:0;padding:0;border:0;border-radius:50%;background:var(--fill);color:var(--acc);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ib svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#sync{min-height:0;padding:0;border-radius:50%;background:var(--acc);color:#fff;font-weight:400}
+#sync:disabled{opacity:.7}
+#hideBtn .sl{display:none}#hideBtn[aria-pressed=true] .sl{display:inline}
+section{border:0;border-radius:16px;padding:16px}
+.k{border:0;border-radius:14px;padding:12px 14px}.k .l,.k .s{font-size:12px}.k .v{font-size:21px;font-weight:700;text-align:left}
+.kp{gap:10px}
+.cl{font-size:13px;margin:10px 0 6px}
+.note{font-size:12px;line-height:1.4}
+.r{min-height:36px;font-size:13px;border-bottom-color:var(--ln)}
+.h{font-size:13px;border-bottom:0;margin-top:16px}
+.qq,.ev{border-bottom-color:var(--ln)}
+.bw,.pbar{background:var(--fill)}
+.chips{gap:8px}
+.chip{border:0;background:var(--fill);min-height:34px;font-size:13px;font-weight:500;padding:0 14px}
+.chip[aria-pressed=true]{background:var(--acc);color:#fff}
+.seg{display:flex;gap:0;background:var(--fill);border-radius:9px;padding:2px;overflow:visible}
+.seg .chip{flex:1;min-height:32px;border-radius:7px;background:transparent;color:var(--ink);padding:0 4px;white-space:nowrap}
+.seg .chip[aria-pressed=true]{background:var(--segOn);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+.btn{border:0;border-radius:12px;background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc);font-weight:600;font-size:15px}
+#wipeBtn{background:color-mix(in srgb,var(--dn) 14%,transparent);color:var(--dn)}
+textarea,.a input,.qf input{border:0;border-radius:10px;background:var(--fill)}
+.tabs{background:color-mix(in srgb,var(--card) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--ln)}
+.tabs button{font-size:10px;font-weight:500}.tabs button[aria-current=page]{color:var(--acc);font-weight:600}.tabs svg{width:25px;height:25px}
+#bar{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:calc(8px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--ln);font-weight:600;font-size:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+#bar.on{opacity:1}#barV{font-variant-numeric:tabular-nums}
+#ptr{height:0;opacity:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--mut)}
+#ptr svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}#ptr.rdy{color:var(--acc)}#ptr.rdy svg{transform:rotate(180deg)}
+.st{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translate(-50%,16px);width:max-content;max-width:min(92vw,520px);margin:0;min-height:0;padding:10px 16px;border-radius:16px;background:color-mix(in srgb,var(--ink) 86%,transparent);color:var(--bg);font-size:13px;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:8}
+.st.on{opacity:1;transform:translate(-50%,0)}.st.err{background:#D70015;color:#fff}
+.dm{font-size:13px;color:var(--mut);margin:8px 0 0;min-height:18px}.dm.err{color:var(--dn)}
+#shBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:20;opacity:0;transition:opacity .28s}#shBg.open{opacity:1}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:88vh;overflow-y:auto;background:var(--card);border-radius:20px 20px 0 0;padding:6px max(18px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));transform:translateY(100%);transition:transform .34s cubic-bezier(.2,.85,.25,1);max-width:860px;margin:0 auto;overscroll-behavior:contain}
+#sheet.open{transform:none}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--fill);margin:4px auto 10px}
+.shh{display:flex;align-items:center;gap:12px}.mono{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.sht{font-size:20px;font-weight:700;font-family:ui-rounded,-apple-system,system-ui,sans-serif}
+.shv{font-size:34px;font-weight:700;letter-spacing:-.6px;margin-top:12px;font-variant-numeric:tabular-nums}
+.shs svg{width:100%;height:64px;margin:10px 0 4px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:6px}.sg>div{padding:10px 0;border-bottom:.5px solid var(--ln);font-size:15px;font-variant-numeric:tabular-nums}.sg>div>span:first-child,.shn>span:first-child,.qf>span{display:block;font-size:12px;color:var(--mut)}
+.qf{display:block;margin-top:14px}.qf input{font:inherit;font-size:17px;width:100%;padding:10px 12px;color:var(--ink);margin-top:4px}
+.shsec{font-size:15px;font-weight:700;margin:20px 0 8px}
+.mt{margin-bottom:10px}.ml{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}.ml b{font-variant-numeric:tabular-nums}
+.shn{font-size:14px;padding:10px 0;border-top:.5px solid var(--ln)}
+@media(prefers-reduced-motion:no-preference){[data-v]{animation:fin .28s ease}@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}#sync:disabled svg{animation:rot .9s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}}
+@media(prefers-reduced-motion:reduce){#sheet,#shBg,.st,#bar{transition:none}}
 </style>
 </head>
 <body>
+<div id="bar" aria-hidden="true"><span id="barT">Übersicht</span><span id="barV" class="num"></span></div>
 <div class="wrap">
+<div id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,13 12,19 18,13"/></svg></div>
 <div class="top" id="uebersicht">
-<div><div class="sub">Krypto-Depot Hub · <span id="npos"></span> Positionen</div><div class="tot num" id="tot">–</div><div class="d24" id="d24"></div><div class="sub" id="asof"></div></div>
-<button id="sync" type="button">Kurse synchronisieren</button>
+<div><div class="sub"><span id="npos"></span> Positionen</div><div class="tot num" id="tot">–</div><div class="d24" id="d24"></div><div class="sub" id="asof"></div></div>
+<div class="acts"><button id="hideBtn" class="ib" type="button" aria-label="Beträge verbergen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><line class="sl" x1="4" y1="20" x2="20" y2="4"/></svg></button><button id="sync" class="ib" type="button" aria-label="Kurse synchronisieren"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><polyline points="20,4 20,8.5 15.5,8.5"/></svg></button></div>
 </div>
 <p class="st" id="st" role="status"></p>
 <section id="empty" hidden><h2>Noch keine Bestände</h2><p style="margin:0 0 8px">Die App enthält keine Mengen. Importiere unten unter „Daten“ einmal deine Datei depot.json. Sie bleibt nur auf diesem Gerät.</p><button class="btn" id="goData" type="button">Zu „Daten“</button></section>
 <div id="main">
 <section style="margin-top:8px" data-v="home">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Depotverlauf</h2><div class="chips" id="cm" style="padding:0"></div></div>
-<div class="d24" id="chartD" style="margin:4px 0;min-height:21px"></div>
+<h2>Depotverlauf</h2>
+<div class="d24" id="chartD" style="margin:0 0 6px;min-height:22px"></div>
 <div class="fig"><svg id="chart" role="img" aria-label="Verlauf des Depotwerts in Euro"></svg></div>
-<div class="sub" id="chartMid" style="margin-top:4px"></div>
+<div class="chips seg" id="cm" style="margin-top:10px"></div>
+<div class="sub" id="chartMid" style="margin-top:10px"></div>
 <p class="note" id="chartNote"></p>
 <div id="hprog" hidden><div class="sub" id="hptxt"></div><div class="pbar"><i id="hpbar" style="width:0%"></i></div></div>
 </section>
@@ -130,16 +198,48 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 <section id="positionen" data-v="pos">
 <h2>Positionen</h2>
 <div class="cl">Ansicht</div>
-<div class="chips" id="vw"></div>
+<div class="chips seg" id="vw"></div>
 <div class="cl">Filter</div>
 <div class="chips" id="flt"></div>
 <div class="cl">Sortierung</div>
-<div class="chips" id="srt"></div>
+<div class="chips seg" id="srt"></div>
 <div id="out"></div>
 <p class="note" id="qnote" hidden>Farbiger Balken = Score. Grauer Balken dahinter = dein Positionsgewicht (größte Position = volle Breite). Ragt Grau weit über die Farbe hinaus, ist die Position groß für ihren Score; ist Grau viel kürzer, ist sie klein dafür. Score 0–100, Modell aus dem Chat, keine Prognose und keine Finanzberatung. Sicherheit = Größe (Market Cap, 1 Mio. $ = 0 bis 50 Mrd. $ = 100), bis zu 30 % davon abhängig von Liquidität (Volumen zu Market Cap) und Umlaufanteil (Market Cap zu voll verwässert), live aus CoinGecko, minus Abzug für dokumentierte Ereignisse. Traktion = belegte Nutzung und institutionelle Anbindung aus unserer Recherche vom 25./26.11. (RWA.xyz, DefiLlama, Stablecoin-Daten, CoinMarketCap-Meldungen): ab 60 gemessene starke Marktstellung, 40 bis 55 datierte Zahlen oder namhafte Partner, 20 bis 35 Ankündigungen ohne Nutzungszahlen, 10 nichts Belegtes. Upside = Raum nach oben (kleinere Market Cap), Traktion und geringe Verwässerung. Gesamt = 45 % Sicherheit, 35 % Traktion, 20 % Upside.</p>
 <p class="note">K = Kernnarrativ (RWA, Finanzwelt on-chain, DeFi, Stablecoins und Zahlungen). Zeile antippen für Menge, Kurs und 7-Tage-Verlauf.</p>
 </section>
 
+<section id="markt" data-v="mkt">
+<h2>Altseason-Radar</h2>
+<div class="rh" id="rHead"></div><div class="sub" id="rSub"></div>
+<div id="rSig" style="margin-top:10px"></div>
+<p class="note">Modell aus fünf Messwerten, kein Kauf- oder Verkaufssignal. Schwellen: Dominanz ±1,5 Punkte, ETH/BTC ±5 %, Stablecoin-Menge +2 % bzw. −1 %, Breite 75 % bzw. 25 %, Depot gegen Bitcoin ±5 Punkte, jeweils über etwa 30 Tage.</p>
+<div id="mprog" hidden><div class="sub" id="mptxt"></div></div>
+</section>
+<section data-v="mkt">
+<h2>Kerzen-Chart</h2>
+<div class="chips seg" id="kCoin"></div>
+<div class="d24" id="kInfo" style="margin:10px 0 6px;min-height:22px"></div>
+<div class="fig"><svg id="kChart" role="img" aria-label="Kerzen-Chart in Euro"></svg></div>
+<div class="chips seg" id="kRng" style="margin-top:10px"></div>
+<p class="note" id="kNote"></p>
+</section>
+<section data-v="mkt">
+<h2>Krypto-Geldmenge</h2>
+<div class="d24" id="sInfo" style="margin:0 0 6px;min-height:22px"></div>
+<div class="fig sm"><svg id="sChart" role="img" aria-label="Stablecoin-Menge in Milliarden Dollar"></svg></div>
+<p class="note" id="sNote"></p>
+</section>
+<section data-v="mkt">
+<h2>ETH gegen BTC</h2>
+<div class="d24" id="eInfo" style="margin:0 0 6px;min-height:22px"></div>
+<div class="fig sm"><svg id="eChart" role="img" aria-label="Kurs von Ethereum in Bitcoin"></svg></div>
+<p class="note">Ein Jahr, Tageswerte. Steigt die Kurve, läuft Ethereum besser als Bitcoin.</p>
+</section>
+<section data-v="mkt">
+<h2>Marktanteile</h2>
+<div class="sum" id="dSum"></div><div class="lg" id="dLg"></div><div class="sub" id="dTot" style="margin-top:8px"></div>
+<p class="note">Der Verlauf der Bitcoin-Dominanz wird ab dem ersten Sync mitgeschrieben, ein Punkt pro Tag.</p>
+</section>
 <section id="analyse" data-v="ana">
 <h2>Analyse der Verteilung</h2>
 <div class="cl">Konzentration</div>
@@ -159,7 +259,7 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 <p class="note">RWA-Daten: fester Stand vom 25.11.2026 (RWA.xyz Distributed, DefiLlama). Sie werden nicht mitsynchronisiert; die Depotwerte daneben schon.</p>
 </section>
 
-<section id="plan" data-v="plan">
+<section id="plan" data-v="ana">
 <h2>Aufstockplan</h2>
 <div id="planr"></div>
 <div class="h"><span>Summe Zukauf</span><span id="plans"></span></div>
@@ -167,7 +267,7 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 <p class="note">Beträge sind änderbar und bleiben auf diesem Gerät. Vorschlag aus dem Chat, keine Finanzberatung.</p>
 </section>
 
-<section id="termine" data-v="plan">
+<section id="termine" data-v="ana">
 <h2>Termine und offene Punkte</h2>
 <div id="evs"></div>
 <p class="note">Aus deinen Angaben vom 25.11.2026 übernommen, hier nicht neu geprüft.</p>
@@ -182,17 +282,19 @@ body[data-view=home] [data-v]:not([data-v=home]),body[data-view=pos] [data-v]:no
 <button class="btn" id="pasteBtn" type="button">Aus Feld importieren</button>
 <button class="btn" id="wipeBtn" type="button">Alles löschen</button>
 </div>
-<p class="st" id="dmsg" role="status"></p>
+<p class="dm" id="dmsg" role="status"></p>
 <label class="cl" for="box">Backup oder Depot-JSON</label>
 <textarea id="box" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
 <p class="note">Mengen änderst du auch direkt: unter „Positionen“ eine Zeile antippen. Ein Backup enthält Mengen, Kurse, eigene Messpunkte und Plan. Die geladene Kurshistorie ist nicht enthalten, sie lässt sich neu laden.</p>
 </section>
 </div>
+<div id="shBg" hidden></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT" hidden><div class="grab"></div><div id="shC"></div></div>
 <nav class="tabs" aria-label="Bereiche" id="tabs">
 <button type="button" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3,17 9,11 13,14 21,6"/><polyline points="16,6 21,6 21,11"/></svg>Übersicht</button>
 <button type="button" data-tab="pos"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="17" x2="11" y2="17"/></svg>Positionen</button>
+<button type="button" data-tab="mkt"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="4" x2="7" y2="20"/><rect x="5" y="8" width="4" height="8" rx="1"/><line x1="17" y1="3" x2="17" y2="18"/><rect x="15" y="6" width="4" height="7" rx="1"/></svg>Markt</button>
 <button type="button" data-tab="ana"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="11"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="14"/></svg>Analyse</button>
-<button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><line x1="12" y1="8.5" x2="12" y2="15.5"/><line x1="8.5" y1="12" x2="15.5" y2="12"/></svg>Plan</button>
 <button type="button" data-tab="data"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6.5" rx="7" ry="2.8"/><path d="M5 6.5v11c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-11"/><path d="M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></svg>Daten</button>
 </nav>
 <script>
@@ -220,11 +322,11 @@ const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
 const usd=d=>S.usd[d.t]??d.u0;
 const chg=d=>S.at?S.chg[d.t]:d.c0;
-const eur=(x,n=2)=>x.toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n})+" €";
+const eur=(x,n=2)=>S.hide?"••••\u00a0€":x.toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n})+" €";
 const pc=(x,n=1)=>x.toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n})+" %";
 const sg=(x,n=1)=>(x>=0?"+":"−")+Math.abs(x).toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n});
 const cls=x=>x>=0?"up":"dn";
-const qty=x=>x.toLocaleString("de-DE",{maximumFractionDigits:x<10?2:0});
+const qty=x=>S.hide?"••••":x.toLocaleString("de-DE",{maximumFractionDigits:x<10?2:0});
 const prc=x=>x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:x<0.01?6:x<1?4:2})+" €";
 const d7=d=>{const s=S.spark[d.t];return s&&s.length>1&&s[0]>0?(usd(d)/s[0]-1)*100:null};
 const cl=x=>Math.max(0,Math.min(1,x));
@@ -256,20 +358,24 @@ function chartPts(mode){const h=hist();
  if(mode==="7d"){const d=series();if(!d)return{pts:null,note:"Die 7-Tage-Kurve erscheint nach dem ersten Sync."};const now=Date.now(),n=d.length-1;return{pts:d.map((v,i)=>({t:now-(n-i)/n*7*864e5,v})),lab:"in 7 Tagen",note:"Rückrechnung: heutige Mengen mal Kurse der letzten 7 Tage. Käufe und Verkäufe sind nicht enthalten."}}
  const N=+mode,hs=hSeries(N);if(!hs)return{pts:null,note:"Für diesen Zeitraum wird die Kurshistorie geladen. Das dauert beim ersten Mal einige Minuten, weil CoinGecko nur wenige Abrufe pro Minute erlaubt."};
  return{pts:hs.pts,lab:N===365?"in 1 Jahr":"in "+N+" Tagen",note:"Rückrechnung: heutige Mengen mal Tagesschlusskurse in Euro, Käufe und Verkäufe sind nicht enthalten. Historie für "+hs.n+" von "+D.length+" Coins ("+pc(hs.cov,0)+" des Depotwerts)"+(hs.n<D.length?"; der Rest ist anteilig hochgerechnet":"")+". Vor dem ersten Kurs eines Coins gilt sein erster Kurs."}}
-function drawChart(){const s=$("chart"),W=s.clientWidth,H=s.clientHeight,h=hist();
+function drawChart(){if(D.length&&D[0].v===undefined)calc();const s=$("chart"),W=s.clientWidth,H=s.clientHeight,h=hist();
  const mode=MODE||(hSeries(30)?"30":series()?"7d":h.length>=2?"hist":"30");
  $("cm").innerHTML=RNG.map(m=>`<button type="button" class="chip" data-m="${m[0]}" aria-pressed="${mode===m[0]}">${m[1]}</button>`).join("");
  const c=chartPts(mode);$("chartNote").textContent=c.note;CH=null;
+ if(c.pts&&c.pts.some(p=>!isFinite(p.v)||!isFinite(p.t)))c.pts=null;
  if(!c.pts||!W){s.innerHTML="";$("chartMid").textContent="";$("chartD").textContent="";return}
  const pts=c.pts,vs=pts.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs),ax=nice(mn,mx,4),G=52,pt=8,pb=20,pw=W-G,ph=H-pt-pb,t0=pts[0].t,t1=pts[pts.length-1].t;
  const x=t=>(t-t0)/((t1-t0)||1)*pw,y=v=>pt+(ax.hi-v)/((ax.hi-ax.lo)||1)*ph;
- const f=vs[0],l=vs[vs.length-1],col=l>=f?"#639922":"#E24B4A";
- const dec=ax.stp<1?2:0,yl=v=>v.toLocaleString("de-DE",{minimumFractionDigits:dec,maximumFractionDigits:dec})+" €";
+ const f=vs[0],l=vs[vs.length-1],col=l>=f?"#34C759":"#FF3B30";
+ const dec=ax.stp<1?2:0,yl=v=>S.hide?"••••":v.toLocaleString("de-DE",{minimumFractionDigits:dec,maximumFractionDigits:dec})+" €";
  let g=ax.t.map(v=>`<line x1="0" x2="${pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${W-2}" y="${(y(v)+3.5).toFixed(1)}" text-anchor="end">${yl(v)}</text>`).join("");
  const span=t1-t0,xf=t=>{const d=new Date(t);return span<2*864e5?d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):span>200*864e5?d.toLocaleDateString("de-DE",{month:"short",year:"2-digit"}):d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})};
  g+=[0,1,2,3].map(i=>{const t=t0+span*i/3;return`<text x="${(i/3*pw).toFixed(1)}" y="${H-5}" text-anchor="${i===0?"start":i===3?"end":"middle"}">${xf(t)}</text>`}).join("");
- const pl=pts.map(p=>x(p.t).toFixed(1)+","+y(p.v).toFixed(1)).join(" ");
- g+=`<polygon points="0,${(pt+ph).toFixed(1)} ${pl} ${pw.toFixed(1)},${(pt+ph).toFixed(1)}" fill="${col}" opacity=".10"/><polyline points="${pl}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+ const P=pts.map(p=>[+x(p.t).toFixed(1),+y(p.v).toFixed(1)]),bot=(pt+ph).toFixed(1);
+ let dp="M"+P[0][0]+","+P[0][1];
+ if(P.length<3||(mode==="hist"&&P.length<=40))dp+=P.slice(1).map(q=>" L"+q[0]+","+q[1]).join("");
+ else{dp+=" L"+((P[0][0]+P[1][0])/2).toFixed(1)+","+((P[0][1]+P[1][1])/2).toFixed(1);for(let i=1;i<P.length-1;i++)dp+=" Q"+P[i][0]+","+P[i][1]+" "+((P[i][0]+P[i+1][0])/2).toFixed(1)+","+((P[i][1]+P[i+1][1])/2).toFixed(1);dp+=" L"+P[P.length-1][0]+","+P[P.length-1][1]}
+ g=`<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".30"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`+g+`<path d="${dp} L${P[P.length-1][0]},${bot} L${P[0][0]},${bot} Z" fill="url(#cg)"/><path d="${dp}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
  if(mode==="hist"&&pts.length<=40)g+=pts.map(p=>`<circle cx="${x(p.t).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.5" fill="${col}"/>`).join("");
  g+=`<circle cx="${x(t1).toFixed(1)}" cy="${y(l).toFixed(1)}" r="3.5" fill="${col}"/><g id="cx" visibility="hidden"><line id="cxl" y1="${pt}" y2="${(pt+ph).toFixed(1)}" stroke="var(--mut)" stroke-width="1" stroke-dasharray="3 3"/><circle id="cxc" r="4.5" fill="var(--card)" stroke="${col}" stroke-width="2"/></g>`;
  s.innerHTML=g;
@@ -279,26 +385,41 @@ function drawChart(){const s=$("chart"),W=s.clientWidth,H=s.clientHeight,h=hist(
  $("chartD").innerHTML=base;CH={pts,x,y,pw,base,span};}
 function chartTouch(e){if(!CH)return;const s=$("chart"),r=s.getBoundingClientRect(),px=Math.max(0,Math.min(CH.pw,e.clientX-r.left));let bi=0,bd=1e9;CH.pts.forEach((p,i)=>{const d=Math.abs(CH.x(p.t)-px);if(d<bd){bd=d;bi=i}});const p=CH.pts[bi],cx=document.getElementById("cx"),ln=document.getElementById("cxl"),cc=document.getElementById("cxc");if(!cx||!ln||!cc)return;
  const X=CH.x(p.t).toFixed(1);ln.setAttribute("x1",X);ln.setAttribute("x2",X);cc.setAttribute("cx",X);cc.setAttribute("cy",CH.y(p.v).toFixed(1));cx.setAttribute("visibility","visible");
- const f=CH.pts[0].v,d=new Date(p.t);$("chartD").textContent=eur(p.v)+" · "+d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"})+(CH.span<10*864e5?" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"")+" · "+sg((p.v/f-1)*100,1)+" % zum Start"}
-function chartLeave(){if(!CH)return;const cx=document.getElementById("cx");if(cx)cx.setAttribute("visibility","hidden");$("chartD").innerHTML=CH.base}
-function spark(d){const s=S.spark[d.t];if(!s||s.length<2)return"";const mn=Math.min(...s),mx=Math.max(...s);const p=s.map((v,i)=>(i*100/(s.length-1)).toFixed(1)+","+(30-(v-mn)*28/((mx-mn)||1)).toFixed(1)).join(" ");return`<svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline points="${p}" fill="none" stroke="${s[s.length-1]>=s[0]?"#639922":"#E24B4A"}" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`}
+ const f=CH.pts[0].v,d=new Date(p.t);$("tot").textContent=eur(p.v);$("d24").innerHTML=`<span class="${cls(p.v-f)}">${sg((p.v/f-1)*100,2)} %</span> <span class="sub">${d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"})}${CH.span<10*864e5?" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""} · zum Start des Zeitraums</span>`}
+function chartLeave(){const cx=document.getElementById("cx");if(cx)cx.setAttribute("visibility","hidden");if(HERO){$("tot").textContent=HERO.tot;$("d24").innerHTML=HERO.d24}}
+function spark(d){const s=S.spark[d.t];if(!s||s.length<2)return"";const mn=Math.min(...s),mx=Math.max(...s);const p=s.map((v,i)=>(i*100/(s.length-1)).toFixed(1)+","+(30-(v-mn)*28/((mx-mn)||1)).toFixed(1)).join(" ");return`<svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline points="${p}" fill="none" stroke="${s[s.length-1]>=s[0]?"#34C759":"#FF3B30"}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`}
 const chTxt=c=>typeof c==="number"&&isFinite(c)?`<span class="${cls(c)}">${sg(c)} %</span>`:"–";
-function row(d,mx){const o=UI.open===d.t;
- return`<button type="button" class="r" data-t="${d.t}" aria-expanded="${o}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span><div class="f" style="width:${Math.max(d.v/mx*100,1.5)}%;background:${C[d.g]}"></div></span><span class="v">${eur(d.v)}</span><span class="p">${pc(d.sh)}</span><span class="c">${chTxt(d.c)}</span></button>`+(o?`<div class="det"><div><span>Menge ${d.t} (änderbar, 0 entfernt)</span><input data-qt="${d.t}" type="number" inputmode="decimal" min="0" step="any" value="${d.q}" aria-label="Menge ${d.t}"></div><div><span>Kurs</span>${prc(d.p)}</div><div><span>24 h</span>${chTxt(d.c)}</div><div><span>7 Tage</span>${chTxt(d.w)}</div><div><span>Gruppe</span>${GN[d.g]}${K.has(d.t)?" · Kern":""}</div>${spark(d)}</div>`:"")}
+function row(d,mx){return`<button type="button" class="r" data-t="${d.t}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span><div class="f" style="width:${Math.max(d.v/mx*100,1.5)}%;background:${C[d.g]}"></div></span><span class="v">${eur(d.v)}</span><span class="p">${pc(d.sh)}</span><span class="c">${chTxt(d.c)}</span></button>`}
 let QMX=1;
-function rowQ(d){const o=UI.open===d.t,c=d.sc,n=x=>Math.round(x);
- return`<button type="button" class="r rq" data-t="${d.t}" aria-expanded="${o}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span class="qb"><i style="width:${Math.max(d.v/QMX*100,1)}%"></i><div class="f" style="width:${Math.max(c[UI.qs],1.5)}%;background:${C[d.g]}"></div></span><span class="v sc">${n(c.tot)}</span><span class="p">${n(c.s)}</span><span class="p">${c.ik?n(c.i):"–"}</span><span class="p">${n(c.u)}</span></button>`+(o?`<div class="det"><div><span>Gesamt</span>${n(c.tot)} von 100</div><div><span>Sicherheit</span>${n(c.s)}</div><div><span>Traktion</span>${c.ik?n(c.i):"– (zählt als 10)"}</div><div><span>Upside</span>${n(c.u)}</div><div><span>Market Cap</span>${c.mc>=1000?(c.mc/1000).toLocaleString("de-DE",{maximumFractionDigits:2})+" Mrd. $":c.mc.toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio. $"}</div><div><span>Umlaufanteil</span>${pc(c.sup,0)}</div><div><span>Volumen zu Market Cap</span>${pc(c.liq)}</div><div><span>Dein Bestand</span>${qty(d.q)} ${d.t} · ${eur(d.v,0)} · ${pc(d.sh)}</div><div style="grid-column:1/-1"><span>Traktion: Beleg</span>${c.ir}</div>${c.fl?`<div style="grid-column:1/-1"><span>Abzug Sicherheit</span>${c.fl}</div>`:""}</div>`:"")}
+function rowQ(d){const c=d.sc,n=x=>Math.round(x);
+ return`<button type="button" class="r rq" data-t="${d.t}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span class="qb"><i style="width:${Math.max(d.v/QMX*100,1)}%"></i><div class="f" style="width:${Math.max(c[UI.qs],1.5)}%;background:${C[d.g]}"></div></span><span class="v sc">${n(c.tot)}</span><span class="p">${n(c.s)}</span><span class="p">${c.ik?n(c.i):"–"}</span><span class="p">${n(c.u)}</span></button>`}
+const mcTxt=m=>m>=1000?(m/1000).toLocaleString("de-DE",{maximumFractionDigits:2})+" Mrd. $":m.toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio. $";
+const MC={A:"#fff",B:"#06222e",C:"#06222e",D:"#fff"};
+const meter=(l,v,known)=>`<div class="mt"><div class="ml"><span>${l}</span><b>${known===false?"–":Math.round(v)}</b></div><div class="bw"><div class="f" style="width:${known===false?0:Math.max(v,1.5)}%;background:var(--acc)"></div></div></div>`;
+function sheetHTML(d){const c=d.sc;return`<div class="shh"><span class="mono" style="background:${C[d.g]};color:${MC[d.g]}">${d.t.slice(0,4)}</span><div style="flex:1"><div class="sht" id="shT">${d.t}</div><div class="sub">${GN[d.g]}${K.has(d.t)?" · Kernnarrativ":""}</div></div><button type="button" class="ib" id="shX" aria-label="Schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><line x1="17" y1="7" x2="7" y2="17"/></svg></button></div>
+<div class="shv num">${eur(d.v)}</div><div class="d24">${chTxt(d.c)} <span class="sub">in 24 h · ${pc(d.sh)} des Depots</span></div>
+<div class="shs">${spark(d)}</div>
+<div class="sg"><div><span>Kurs</span>${prc(d.p)}</div><div><span>7 Tage</span>${chTxt(d.w)}</div><div><span>Market Cap</span>${mcTxt(c.mc)}</div><div><span>Umlaufanteil</span>${pc(c.sup,0)}</div></div>
+<label class="qf"><span>Menge ${d.t} (0 entfernt die Position)</span><input data-qt="${d.t}" type="number" inputmode="decimal" min="0" step="any" ${S.hide?'disabled placeholder="verborgen"':`value="${d.q}"`}></label>
+<div class="shsec">Qualität · ${Math.round(c.tot)} von 100</div>
+${meter("Sicherheit",c.s)}${meter("Traktion",c.i,c.ik)}${meter("Upside",c.u)}
+<div class="shn"><span>Traktion: Beleg</span>${c.ir}</div>${c.fl?`<div class="shn"><span>Abzug Sicherheit</span>${c.fl}</div>`:""}`}
+let SHT=null;
+function openSheet(t){const d=by(t);if(!d)return;SHT=t;$("shC").innerHTML=sheetHTML(d);const sh=$("sheet"),bg=$("shBg");sh.hidden=false;bg.hidden=false;sh.scrollTop=0;requestAnimationFrame(()=>requestAnimationFrame(()=>{sh.classList.add("open");bg.classList.add("open")}))}
+function closeSheet(){if(!SHT)return;SHT=null;const sh=$("sheet"),bg=$("shBg");sh.classList.remove("open");bg.classList.remove("open");setTimeout(()=>{if(!SHT){sh.hidden=true;bg.hidden=true}},340)}
 const SIG=[["stark","#639922","ONDO MORPHO SOL XRP"],["neutral","#85B7EB","AAVE ENA SYRUP"],["schwach","#EF9F27","AVAX PLUME ALGO NEAR"],["keine Daten","#B4B2A9","LINK CLEAR QNT POLYX STABLE XDP IOTA"]];
 const R=[["ONDO","Plattform #1 · 4,07 Mrd. $ · +0,8 %",1],["MORPHO","RWA-Lending #1 · 843 Mio. $",1],["SOL","Netzwerk #3 · 5,13 Mrd. $ · 98 % dist.",1],["XRP","Netzwerk #5 · 2,8–3,2 Mrd. $ · −6,8 %",1],["AAVE","V3 334 + Horizon 98 Mio. $",2],["ENA","Plattform #11 · 1,14 Mrd. $ · rückläufig",2],["SYRUP","Plattform #12 · 951 Mio. $ · rückläufig",2],["AVAX","Netzwerk #6 · 1,33 Mrd. $ · −15,1 % · 10 % dist.",3],["PLUME","Netzwerk #16 · 140 Mio. $ · rückläufig",3],["ALGO","Netzwerk #22 · 30 Mio. $ · 1 Asset",3],["NEAR","Netzwerk #26 · 13 Mio. $ · 2 Assets",3],["LINK","Oracle – nicht gemessen",4],["CLEAR","Seite ohne Daten",4],["QNT","nicht gemessen",4],["POLYX","nicht gelistet",4],["STABLE","nicht gelistet",4],["XDP","nicht gemessen",4],["IOTA","nicht gelistet",4]];
 const L=["","stark","neutral","schwach","k. D."];
 const EV=[["STABLE","2026-12-08","Token-Unlock"],["ONDO","2027-01-18","Token-Unlock"],["CLEAR","2027-02-17","Frist Tausch CPOOL → CLEAR (1:1)"],["DASH","2027-07-10","EU-Verbot von Privacy-Coins auf regulierten Plattformen"],["AKE","","Monatlicher Unlock von 2,11 Mrd. Token"],["ALU","","Kein offizieller Tausch ALU → KUVI gefunden"]];
 const by=t=>D.find(d=>d.t===t);
+let TT=0,HERO=null;
 function render(){
  $("empty").hidden=D.length>0;$("main").hidden=!D.length;if(!D.length){if(document.body.dataset.view!=="data")document.body.dataset.view="home";$("tot").textContent="–";$("npos").textContent="0";return}
  const T=calc();const mx=Math.max(...D.map(d=>d.v));
- $("tot").textContent=eur(T);$("npos").textContent=D.length;
+ $("tot").textContent=eur(T);$("npos").textContent=D.length;$("barV").textContent=eur(T,0);TT=T;$("hideBtn").setAttribute("aria-pressed",S.hide?"true":"false");$("hideBtn").setAttribute("aria-label",S.hide?"Beträge anzeigen":"Beträge verbergen");
  const prev=D.reduce((a,d)=>a+(typeof d.c==="number"?d.v/(1+d.c/100):d.v),0),dl=T-prev;
  $("d24").innerHTML=`<span class="${cls(dl)}">${sg(dl,2)} € (${sg(dl/prev*100,2)} %)</span> <span class="sub">in 24 h</span>`;
+ HERO={tot:eur(T),d24:$("d24").innerHTML};
  {const age=S.at?(Date.now()-S.at)/36e5:0;$("asof").textContent=S.at?"Kurse: CoinGecko, "+new Date(S.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+(age>=24?" · "+Math.floor(age/24)+" Tag"+(age>=48?"e":"")+" alt":""):"Kurse: fester Stand vom 25./26.11.2026 bis zum ersten Sync";$("asof").className="sub"+(age>=24?" stale":"")}
  const kS=D.filter(d=>K.has(d.t)).reduce((a,d)=>a+d.sh,0);const srt=D.slice().sort((a,b)=>b.v-a.v);
  const ser=series();const w7=ser?(T/ser[0]-1)*100:null;const h30=hSeries(30),w30=h30?(T/h30.pts[0].v-1)*100:null;
@@ -349,18 +470,101 @@ $("planr").addEventListener("input",e=>{const m=e.target.id&&e.target.id.match(/
 $("flt").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(b){UI.f=b.dataset.f;render()}});
 $("srt").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){if(UI.q)UI.qs=b.dataset.s;else UI.s=b.dataset.s;render()}});
 $("vw").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){UI.q=b.dataset.q==="1";UI.open=null;render()}});
-$("out").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b){UI.open=UI.open===b.dataset.t?null:b.dataset.t;render()}});
+$("out").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)openSheet(b.dataset.t)});
+$("shBg").addEventListener("click",closeSheet);
+$("shC").addEventListener("click",e=>{if(e.target.closest("#shX"))closeSheet()});
+$("shC").addEventListener("change",e=>{const t=e.target.dataset&&e.target.dataset.qt;if(!t||S.hide)return;S.q[t]=Math.max(0,+e.target.value||0);save();location.reload()});
+{let sy=null;const sh=$("sheet");sh.addEventListener("touchstart",e=>{sy=sh.scrollTop<=0?e.touches[0].clientY:null},{passive:true});sh.addEventListener("touchend",e=>{if(sy!==null&&e.changedTouches[0].clientY-sy>90)closeSheet();sy=null},{passive:true})}
+$("hideBtn").addEventListener("click",()=>{S.hide=!S.hide;save();render();if(SHT)$("shC").innerHTML=sheetHTML(by(SHT))});
 $("cm").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b){MODE=b.dataset.m;drawChart();if(/^\d+$/.test(MODE))hStart()}});
 {const c=$("chart");c.addEventListener("pointerdown",chartTouch);c.addEventListener("pointermove",chartTouch);c.addEventListener("pointerleave",chartLeave);c.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")setTimeout(chartLeave,1500)});c.addEventListener("pointercancel",chartLeave)}
-function setView(v){document.body.dataset.view=v;$("tabs").querySelectorAll("[data-tab]").forEach(b=>{if(b.dataset.tab===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});try{sessionStorage.setItem("depot-view",v)}catch(e){}window.scrollTo(0,0);if(v==="home")drawChart()}
+const VT={home:"Übersicht",pos:"Positionen",mkt:"Markt",ana:"Analyse",data:"Daten"};
+function setView(v){if(!VT[v])v="home";document.body.dataset.view=v;$("barT").textContent=VT[v]||"";closeSheet();$("tabs").querySelectorAll("[data-tab]").forEach(b=>{if(b.dataset.tab===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});try{sessionStorage.setItem("depot-view",v)}catch(e){}window.scrollTo(0,0);if(v==="home")drawChart();if(v==="mkt")renderMarket()}
 $("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)setView(b.dataset.tab)});
 $("goData").addEventListener("click",()=>setView("data"));
 const ALT={CLEAR:"clearpool"},GAP=7000;let hBusy=false,hTimer=null;
 const hNeed=()=>{const now=Date.now();return D.filter(d=>!PH[d.t]||now-PH[d.t].at>864e5).sort((a,b)=>b.v-a.v)};
 function hProg(msg){const need=hNeed().length,done=D.length-need;$("hprog").hidden=!need&&!msg;$("hptxt").textContent=msg||("Kurshistorie: "+done+" von "+D.length+" Coins geladen");$("hpbar").style.width=(D.length?done/D.length*100:0)+"%"}
-async function hFetch(id){const r=await fetch(API+"/coins/"+id+"/market_chart?vs_currency=eur&days=365&interval=daily",{credentials:"omit",referrerPolicy:"no-referrer"});if(r.status===429)throw{lim:1};if(!r.ok)throw{st:r.status};const j=await r.json(),m=new Map();(j&&Array.isArray(j.prices)?j.prices:[]).forEach(p=>{const v=Number(p&&p[1]);if(v>0)m.set(dayN(Number(p[0])),+v.toPrecision(6))});return m}
+async function hFetch(id){const j=await cg("/coins/"+id+"/market_chart?vs_currency=eur&days=365&interval=daily"),m=new Map();(j&&Array.isArray(j.prices)?j.prices:[]).forEach(p=>{const v=Number(p&&p[1]);if(v>0)m.set(dayN(Number(p[0])),+v.toPrecision(6))});return m}
 function dense(m){const ks=[...m.keys()].sort((a,b)=>a-b);if(!ks.length)return null;const d0=ks[0],p=[];let last=m.get(d0);for(let k=d0;k<=ks[ks.length-1];k++){if(m.has(k))last=m.get(k);p.push(last)}return{d0,p}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let nextAt=0;
+async function cg(path){const w=nextAt-Date.now();if(w>0)await sleep(w);nextAt=Date.now()+GAP;let r;try{r=await fetch(API+path,{credentials:"omit",referrerPolicy:"no-referrer"})}catch(e){nextAt=Date.now()+65000;throw{lim:1}}if(r.status===429){nextAt=Date.now()+65000;throw{lim:1}}if(!r.ok)throw{st:r.status};return r.json()}
+const MKK="depot-market-v1";let MK={};try{MK=JSON.parse(localStorage.getItem(MKK)||"{}")||{}}catch(e){MK={}}
+const saveM=()=>{try{localStorage.setItem(MKK,JSON.stringify(MK))}catch(e){}};
+const STB=[["tether","USDT"],["usd-coin","USDC"],["ethena-usde","USDe"],["dai","DAI"]];
+const EXB=new Set("usdt usdc dai usde usds usd1 fdusd pyusd tusd usdd usdy buidl susde susds wbtc weth steth wsteth weeth cbbtc reth lbtc solvbtc wbeth leo jitosol bnsol rseth usdtb usdf rlusd usd0 xaut paxg bsc-usd usdc.e meth ezeth cbeth".split(" "));
+let KC="bitcoin",KR="30";
+function mTasks(){const H12=12*36e5,oh=(c,d)=>({k:"o_"+c+"_"+d,ttl:d==="30"?3*36e5:H12,p:"/coins/"+c+"/ohlc?vs_currency=eur&days="+d,f:j=>{if(!Array.isArray(j))return;MK.ohlc=MK.ohlc||{};MK.ohlc[c+"_"+d]=j.filter(x=>Array.isArray(x)&&x.length>=5).map(x=>[x[0],+(+x[1]).toPrecision(6),+(+x[2]).toPrecision(6),+(+x[3]).toPrecision(6),+(+x[4]).toPrecision(6)])}});
+ const sel=KR==="365"?"365":"30",oth=KC==="bitcoin"?"ethereum":"bitcoin";
+ return[
+ {k:"global",ttl:36e5,p:"/global",f:j=>{const d=j&&j.data;if(!d)return;const m=d.market_cap_percentage||{};const stab="usdt usdc dai usde usds usd1 fdusd pyusd usdtb rlusd tusd usdd".split(" ").reduce((a,x)=>a+(+m[x]||0),0);MK.global={btc:+m.btc||0,eth:+m.eth||0,stab,total:+(d.total_market_cap&&d.total_market_cap.usd)||0};const now=Date.now();MK.dom=(MK.dom||[]).filter(x=>now-x.t<400*864e5&&dayN(x.t)!==dayN(now));MK.dom.push({t:now,b:+(+m.btc).toFixed(2)})}},
+ {k:"breadth",ttl:6*36e5,p:"/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=90&page=1&price_change_percentage=30d",f:j=>{if(!Array.isArray(j))return;const ch=c=>c.price_change_percentage_30d_in_currency,bt=j.find(c=>c.id==="bitcoin"),b=bt&&ch(bt)!==null?+ch(bt):null;const al=j.filter(c=>c.id!=="bitcoin"&&!EXB.has(String(c.symbol).toLowerCase())&&ch(c)!==null&&isFinite(+ch(c))).slice(0,50);if(b===null||!isFinite(b)||!al.length)return;MK.breadth={n:al.length,win:al.filter(c=>+ch(c)>b).length,btc:b}}},
+ oh(KC,sel),
+ {k:"ethbtc",ttl:H12,p:"/coins/ethereum/market_chart?vs_currency=btc&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.prices))MK.ethbtc=j.prices.filter(p=>p[1]>0).map(p=>[p[0],+(+p[1]).toPrecision(5)])}},
+ {k:"btcH",ttl:H12,p:"/coins/bitcoin/market_chart?vs_currency=eur&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.prices))MK.btcH=j.prices.filter(p=>p[1]>0).map(p=>[dayN(p[0]),Math.round(p[1])])}},
+ ...STB.map(x=>({k:"st_"+x[0],ttl:H12,p:"/coins/"+x[0]+"/market_chart?vs_currency=usd&days=365&interval=daily",f:j=>{if(j&&Array.isArray(j.market_caps)){MK.stb=MK.stb||{};MK.stb[x[0]]=j.market_caps.filter(p=>p[1]>0).map(p=>[dayN(p[0]),Math.round(p[1]/1e6)])}}})),
+ oh(KC,sel==="30"?"365":"30"),oh(oth,"30"),oh(oth,"365")]}
+const mNeed=()=>{const at=MK.at||{},now=Date.now();return mTasks().filter(t=>!at[t.k]||now-at[t.k]>t.ttl)};
+let mBusy=false;
+function mProg(n,paused){$("mprog").hidden=!n;$("mptxt").textContent=n?(paused?(navigator.onLine===false?"Marktdaten pausiert – offline":"Marktdaten pausieren kurz – CoinGecko-Limit, geht in etwa einer Minute weiter"):"Marktdaten werden geladen, noch "+n+" Abruf"+(n>1?"e":"")):""}
+async function mRun(){if(mBusy||!D.length)return;mBusy=true;MK.at=MK.at||{};let fails=0;
+ for(;;){const n=mNeed();if(!n.length)break;const t=n[0];mProg(n.length);
+  try{const j=await cg(t.p);t.f(j);MK.at[t.k]=Date.now();saveM();renderMarket()}
+  catch(e){if(e&&e.st){MK.at[t.k]=Date.now();saveM()}else{fails++;mProg(n.length,true);if(fails>8||navigator.onLine===false)break}}}
+ mBusy=false;mProg(0);renderMarket()}
+function stabSeries(){const S0=MK.stb||{},ids=STB.map(x=>x[0]).filter(id=>S0[id]&&S0[id].length>1);if(!ids.length)return null;const d0=Math.max(...ids.map(id=>S0[id][0][0])),d1=Math.min(...ids.map(id=>S0[id][S0[id].length-1][0]));if(d1<=d0)return null;const maps=ids.map(id=>new Map(S0[id])),last=ids.map(()=>0),pts=[];
+ for(let k=d0;k<=d1;k++){let v=0;maps.forEach((m,i)=>{if(m.has(k))last[i]=m.get(k);v+=last[i]});pts.push({t:k*864e5,v:v/1000})}return{pts,names:STB.filter(x=>ids.includes(x[0])).map(x=>x[1])}}
+function signals(){const o=[],G=MK.global,now=Date.now();
+ {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";if(G){val=pc(G.btc);const c=(MK.dom||[]).filter(x=>now-x.t>=6*864e5&&now-x.t<=35*864e5).sort((a,b)=>a.t-b.t)[0];if(c){const df=G.btc-c.b;st=df<=-1.5?1:df>=1.5?3:2;txt=sg(df)+" Punkte seit "+new Date(c.t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+". Fallende Dominanz spricht für Altcoins."}else txt="Der Trend wird ab jetzt mitgeschrieben. Eine Aussage gibt es nach etwa einer Woche."}o.push(["Bitcoin-Dominanz",val,st,txt])}
+ {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const e=MK.ethbtc;if(e&&e.length>32){const l=e[e.length-1][1],p=e[e.length-31][1],ch=(l/p-1)*100,ma=e.slice(-200).reduce((a,x)=>a+x[1],0)/Math.min(200,e.length);val=l.toLocaleString("de-DE",{minimumFractionDigits:4,maximumFractionDigits:4});st=ch>=5?1:ch<=-5?3:2;txt=sg(ch)+" % in 30 Tagen, "+(l>=ma?"über":"unter")+" dem 200-Tage-Schnitt."}o.push(["ETH gegen BTC",val,st,txt])}
+ {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const s=stabSeries();if(s&&s.pts.length>31){const l=s.pts[s.pts.length-1].v,p=s.pts[s.pts.length-31].v,ch=(l/p-1)*100;val=l.toLocaleString("de-DE",{maximumFractionDigits:1})+" Mrd. $";st=ch>=2?1:ch<=-1?3:2;txt=sg(ch)+" % in 30 Tagen ("+s.names.join(", ")+"). Wachstum heißt frisches Geld im Markt."}o.push(["Stablecoin-Menge",val,st,txt])}
+ {let st=0,val="–",txt="Noch keine Daten, nach dem Sync verfügbar.";const b=MK.breadth;if(b&&b.n){const sh=b.win/b.n*100;val=pc(sh,0);st=sh>=75?1:sh<=25?3:2;txt=b.win+" von "+b.n+" großen Altcoins liefen in 30 Tagen besser als Bitcoin ("+sg(b.btc)+" %)."}o.push(["Altcoin-Breite",val,st,txt])}
+ {let st=0,val="–",txt="Braucht die Kurshistorie deines Depots und von Bitcoin.";const hs=hSeries(30),bh=MK.btcH;if(hs&&bh&&bh.length>31){const T=hs.pts[hs.pts.length-1].v,pr=(T/hs.pts[0].v-1)*100,br=(bh[bh.length-1][1]/bh[bh.length-31][1]-1)*100,df=pr-br;val=sg(df)+" Pkt.";st=df>=5?1:df<=-5?3:2;txt="Depot "+sg(pr)+" %, Bitcoin "+sg(br)+" % in 30 Tagen (Rückrechnung mit heutigen Mengen)."}o.push(["Depot gegen Bitcoin",val,st,txt])}
+ return o}
+const SC=["#8E8E93","#34C759","#FF9F0A","#FF3B30"],SL=["offen","spricht dafür","neutral","spricht dagegen"];
+function miniPlot(id,pts,fy,col){const s=$(id),W=s.clientWidth,H=s.clientHeight;if(!pts||pts.length<2||!W){s.innerHTML="";return}
+ const vs=pts.map(p=>p.v),ax=nice(Math.min(...vs),Math.max(...vs),3),G=58,pt=8,pb=20,pw=W-G,ph=H-pt-pb,t0=pts[0].t,t1=pts[pts.length-1].t,x=t=>(t-t0)/((t1-t0)||1)*pw,y=v=>pt+(ax.hi-v)/((ax.hi-ax.lo)||1)*ph,bot=(pt+ph).toFixed(1);
+ let g=`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`+ax.t.map(v=>`<line x1="0" x2="${pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${W-2}" y="${(y(v)+3.5).toFixed(1)}" text-anchor="end">${fy(v,ax.stp)}</text>`).join("");
+ g+=[0,1,2].map(i=>`<text x="${(i/2*pw).toFixed(1)}" y="${H-5}" text-anchor="${i===0?"start":i===2?"end":"middle"}">${new Date(t0+(t1-t0)*i/2).toLocaleDateString("de-DE",{month:"short",year:"2-digit"})}</text>`).join("");
+ const dp="M"+pts.map(p=>x(p.t).toFixed(1)+","+y(p.v).toFixed(1)).join(" L");
+ s.innerHTML=g+`<path d="${dp} L${pw.toFixed(1)},${bot} L0,${bot} Z" fill="url(#g${id})"/><path d="${dp}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(t1).toFixed(1)}" cy="${y(vs[vs.length-1]).toFixed(1)}" r="3.5" fill="${col}"/>`}
+function candles(){const o=MK.ohlc&&MK.ohlc[KC+"_"+(KR==="365"?"365":"30")];if(!o||!o.length)return null;if(KR==="365")return o;if(KR==="7")return o.slice(-42);
+ const m=new Map();o.forEach(c=>{const k=dayN(c[0]-1),e=m.get(k);if(!e)m.set(k,[k*864e5,c[1],c[2],c[3],c[4]]);else{e[2]=Math.max(e[2],c[2]);e[3]=Math.min(e[3],c[3]);e[4]=c[4]}});return[...m.values()].sort((a,b)=>a[0]-b[0]).slice(-30)}
+let KD=null;
+const kFmt=v=>v.toLocaleString("de-DE",{maximumFractionDigits:v<1000?2:0})+" €";
+function kBase(){const c=KD&&KD.c;if(!c){$("kInfo").textContent="";return}const l=c[c.length-1][4],f=c[0][1],ch=(l/f-1)*100;$("kInfo").innerHTML=`${kFmt(l)} <span class="${cls(ch)}">${sg(ch)} %</span> <span class="sub">${KR==="365"?"in 1 Jahr":"in "+KR+" Tagen"}</span>`}
+function drawK(){const s=$("kChart"),W=s.clientWidth,H=s.clientHeight;
+ $("kCoin").innerHTML=[["bitcoin","Bitcoin"],["ethereum","Ethereum"]].map(m=>`<button type="button" class="chip" data-kc="${m[0]}" aria-pressed="${KC===m[0]}">${m[1]}</button>`).join("");
+ $("kRng").innerHTML=[["7","7 T"],["30","30 T"],["365","1 J"]].map(m=>`<button type="button" class="chip" data-kr="${m[0]}" aria-pressed="${KR===m[0]}">${m[1]}</button>`).join("");
+ $("kNote").textContent=KR==="7"?"4-Stunden-Kerzen in Euro.":KR==="30"?"Tageskerzen in Euro, aus 4-Stunden-Kerzen zusammengefasst.":"4-Tages-Kerzen in Euro. Feinere Kerzen liefert die kostenlose Schnittstelle für ein Jahr nicht.";
+ const c=candles();KD=null;if(!c||!W){s.innerHTML="";$("kInfo").textContent=c?"":"Kerzen erscheinen nach dem Sync.";return}
+ const ax=nice(Math.min(...c.map(x=>x[3])),Math.max(...c.map(x=>x[2])),4),G=62,pt=8,pb=20,pw=W-G,ph=H-pt-pb,n=c.length,bw=Math.max(1.5,pw/n*.62),y=v=>pt+(ax.hi-v)/((ax.hi-ax.lo)||1)*ph,xc=i=>(i+.5)*pw/n;
+ let g=ax.t.map(v=>`<line x1="0" x2="${pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${W-2}" y="${(y(v)+3.5).toFixed(1)}" text-anchor="end">${v.toLocaleString("de-DE",{maximumFractionDigits:0})} €</text>`).join("");
+ const df=t=>new Date(t).toLocaleDateString("de-DE",KR==="365"?{month:"short",year:"2-digit"}:{day:"2-digit",month:"2-digit"});
+ g+=[0,1,2].map(i=>{const k=Math.round(i/2*(n-1));return`<text x="${(i/2*pw).toFixed(1)}" y="${H-5}" text-anchor="${i===0?"start":i===2?"end":"middle"}">${df(c[k][0])}</text>`}).join("");
+ g+=c.map((k,i)=>{const up=k[4]>=k[1],col=up?"#34C759":"#FF3B30",top=y(Math.max(k[1],k[4])),hh=Math.max(1,Math.abs(y(k[1])-y(k[4])));return`<line x1="${xc(i).toFixed(1)}" x2="${xc(i).toFixed(1)}" y1="${y(k[2]).toFixed(1)}" y2="${y(k[3]).toFixed(1)}" stroke="${col}" stroke-width="1.2"/><rect x="${(xc(i)-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(1.5,bw/3).toFixed(1)}" fill="${col}"/>`}).join("");
+ g+=`<line id="kx" y1="${pt}" y2="${(pt+ph).toFixed(1)}" stroke="var(--mut)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>`;
+ s.innerHTML=g;KD={c,pw,n,xc};kBase()}
+function kTouch(e){if(!KD)return;const r=$("kChart").getBoundingClientRect(),i=Math.max(0,Math.min(KD.n-1,Math.floor((e.clientX-r.left)/(KD.pw/KD.n)))),k=KD.c[i],ln=document.getElementById("kx");if(ln){const X=KD.xc(i).toFixed(1);ln.setAttribute("x1",X);ln.setAttribute("x2",X);ln.setAttribute("visibility","visible")}
+ const d=new Date(k[0]);$("kInfo").innerHTML=`<span class="sub">${d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"2-digit"})}${KR==="7"?" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span> E ${kFmt(k[1])} · H ${kFmt(k[2])} · T ${kFmt(k[3])} · S <span class="${cls(k[4]-k[1])}">${kFmt(k[4])}</span>`}
+function kLeave(){const ln=document.getElementById("kx");if(ln)ln.setAttribute("visibility","hidden");kBase()}
+function renderMarket(){const sg5=signals(),kn=sg5.filter(x=>x[2]>0),gr=kn.filter(x=>x[2]===1).length,rd=kn.filter(x=>x[2]===3).length;
+ $("rHead").textContent=!kn.length?"Noch keine Marktdaten":gr>=4?"Altseason-Signale überwiegen":rd>=Math.max(3,kn.length-1)?"Bitcoin führt den Markt":gr>rd?"Leicht positiv für Altcoins":rd>gr?"Eher gegen Altcoins":"Gemischtes Bild";
+ $("rSub").textContent=kn.length?gr+" von "+kn.length+" bewertbaren Signalen sprechen für Altcoins, "+rd+" dagegen."+(MK.at&&MK.at.global?" Stand "+new Date(MK.at.global).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+".":""):"Die Marktdaten laden nach dem nächsten Sync.";
+ $("rSig").innerHTML=sg5.map(x=>`<div class="sig"><i style="background:${SC[x[2]]}"></i><b>${x[0]}</b><span class="sv">${x[1]}<em>${SL[x[2]]}</em></span><small>${x[3]}</small></div>`).join("");
+ const G=MK.global;
+ if(G&&G.total){const alt=Math.max(0,100-G.btc-G.eth-G.stab),P=[["Bitcoin","#FF9F0A",G.btc],["Ethereum","#5E5CE6",G.eth],["Stablecoins (Top 10)","#30B0C7",G.stab],["Übrige Altcoins","#34C759",alt]];$("dSum").innerHTML=P.map(p=>`<div style="width:${p[2]}%;background:${p[1]}"></div>`).join("");$("dLg").innerHTML=P.map(p=>`<span><i style="background:${p[1]}"></i>${p[0]} ${pc(p[2])}</span>`).join("");$("dTot").textContent="Gesamtmarkt "+(G.total/1e12).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" Bio. $"}
+ else{$("dSum").innerHTML="";$("dLg").innerHTML="";$("dTot").textContent="Marktanteile erscheinen nach dem Sync."}
+ if(document.body.dataset.view!=="mkt")return;
+ drawK();
+ const st=stabSeries();if(st){const l=st.pts[st.pts.length-1].v,f=st.pts[0].v,ch=(l/f-1)*100;$("sInfo").innerHTML=`${l.toLocaleString("de-DE",{maximumFractionDigits:1})} Mrd. $ <span class="${cls(ch)}">${sg(ch)} %</span> <span class="sub">in 1 Jahr</span>`;$("sNote").textContent="Summe der Marktkapitalisierung von "+st.names.join(", ")+". Das ist die Geldmenge innerhalb von Krypto, vergleichbar mit M1/M2. Notenbank-Geldmengen sind nicht enthalten."}else{$("sInfo").textContent="";$("sNote").textContent="Die Stablecoin-Menge erscheint nach dem Sync."}
+ miniPlot("sChart",st&&st.pts,(v)=>v.toLocaleString("de-DE",{maximumFractionDigits:0})+" Mrd.","#30B0C7");
+ const e=MK.ethbtc;if(e&&e.length>1){const l=e[e.length-1][1],f=e[0][1],ch=(l/f-1)*100;$("eInfo").innerHTML=`${l.toLocaleString("de-DE",{minimumFractionDigits:4,maximumFractionDigits:4})} BTC <span class="${cls(ch)}">${sg(ch)} %</span> <span class="sub">in 1 Jahr</span>`}else $("eInfo").textContent="Erscheint nach dem Sync.";
+ miniPlot("eChart",e&&e.map(p=>({t:p[0],v:p[1]})),(v,stp)=>v.toLocaleString("de-DE",{minimumFractionDigits:stp<.001?4:3,maximumFractionDigits:stp<.001?4:3}),"#5E5CE6")}
+$("kCoin").addEventListener("click",e=>{const b=e.target.closest("[data-kc]");if(b){KC=b.dataset.kc;drawK()}});
+$("kRng").addEventListener("click",e=>{const b=e.target.closest("[data-kr]");if(b){KR=b.dataset.kr;drawK()}});
+{const c=$("kChart");c.addEventListener("pointerdown",kTouch);c.addEventListener("pointermove",kTouch);c.addEventListener("pointerleave",kLeave);c.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")setTimeout(kLeave,2500)});c.addEventListener("pointercancel",kLeave)}
 async function hStep(){hTimer=null;if(hBusy)return;const need=hNeed();if(!need.length){hProg();render();return}hBusy=true;const d=need[0];let delay=GAP;
  try{const m=await hFetch(d.id);const today=dayN(Date.now());
   if(ALT[d.t]&&m.size&&Math.min(...m.keys())>today-360){await sleep(GAP);const first=Math.min(...m.keys());try{const m2=await hFetch(ALT[d.t]);m2.forEach((v,k)=>{if(k<first)m.set(k,v)})}catch(e){if(!e||!e.st)throw e}}
@@ -371,8 +575,9 @@ async function hStep(){hTimer=null;if(hBusy)return;const need=hNeed();if(!need.l
 function hStart(){if(!D.length||hBusy||hTimer||!hNeed().length)return;hProg();hTimer=setTimeout(hStep,400)}
 function putSnap(sn){const k=hkey(sn.t);const i=HIST.findIndex(x=>x&&hkey(x.t)===k);if(i>=0)HIST[i]=sn;else HIST.push(sn)}
 function saveSnap(T){putSnap({t:Date.now(),v:+T.toFixed(2)});S.hist=hist().slice(-1500);save();drawChart()}
-const st=(m,err)=>{$("st").textContent=m;$("st").className="st"+(err?" err":"")};
+let stT=null;const st=(m,err)=>{const e=$("st");e.textContent=m;e.className="st"+(m?" on":"")+(err?" err":"");clearTimeout(stT);if(m&&!/…$/.test(m))stT=setTimeout(()=>{e.className="st"+(err?" err":"")},err?8000:4500)};
 const API="https://api.coingecko.com/api/v3";
+function countUp(a,b){if(S.hide||!(a>0)||a===b||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))return;const t0=performance.now(),el=$("tot"),step=t=>{const k=Math.min(1,(t-t0)/650),e=1-Math.pow(1-k,3);el.textContent=eur(a+(b-a)*e);if(k<1)requestAnimationFrame(step);else if(HERO)el.textContent=HERO.tot};requestAnimationFrame(step)}
 const down=(a,n)=>{if(a.length<=n)return a;const o=[];for(let i=0;i<n;i++)o.push(a[Math.round(i*(a.length-1)/(n-1))]);return o};
 async function sync(){const b=$("sync");if(!D.length){st("Erst Bestände importieren.",true);return}b.disabled=true;st("Lade Kurse …");
  try{const ids=D.map(d=>d.id).join(",");
@@ -388,26 +593,30 @@ async function sync(){const b=$("sync");if(!D.length){st("Erst Bestände importi
     const sp=c.sparkline_in_7d&&Array.isArray(c.sparkline_in_7d.price)?c.sparkline_in_7d.price.map(Number).filter(x=>x>0):[];if(sp.length>1)S.spark[d.t]=down(sp,48).map(x=>+x.toPrecision(5));else delete S.spark[d.t]}
    else miss.push(d.t)});
   if(!n){st("Keine Kurse erhalten.",true);return}
-  S.at=Date.now();S.fx=rate;save();render();saveSnap(D.reduce((a,d)=>a+d.v,0));setTimeout(hStart,GAP);
+  const oldT=TT;S.at=Date.now();S.fx=rate;save();render();countUp(oldT,TT);saveSnap(D.reduce((a,d)=>a+d.v,0));nextAt=Date.now()+GAP;setTimeout(hStart,GAP);setTimeout(mRun,600);
   st(n+" von "+D.length+" Kursen aktualisiert · EUR/USD "+(1/rate).toFixed(4).replace(".",",")+"."+(miss.length?" Ohne Kurs (alter Wert bleibt): "+miss.join(", ")+".":""),!!miss.length);
  }catch(e){st(navigator.onLine===false?"Offline – der Sync braucht Internet.":"Abruf fehlgeschlagen – später erneut versuchen.",true)}finally{b.disabled=false}}
 $("sync").addEventListener("click",sync);
-$("out").addEventListener("change",e=>{const t=e.target.dataset&&e.target.dataset.qt;if(!t)return;S.q[t]=Math.max(0,+e.target.value||0);save();location.reload()});
 function applyImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return"Kein gültiges JSON."}
  if(!o||typeof o!=="object")return"Kein gültiges JSON.";
  if(o.app==="depot-backup"&&o.state&&typeof o.state==="object"){S=o.state;save();return""}
  const h=o.holdings&&typeof o.holdings==="object"?o.holdings:o;const known=new Set(ALL.map(d=>d.t));let n=0;const skip=[];
  Object.keys(h).forEach(k=>{const t=String(k).toUpperCase(),v=Number(h[k]);if(!isFinite(v)||v<0)return;if(known.has(t)){S.q[t]=v;n++}else skip.push(t)});
  if(!n)return"Keine bekannten Coins gefunden.";save();return skip.length?"ok:"+skip.join(", "):""}
-const dmsg=(m,err)=>{$("dmsg").textContent=m;$("dmsg").className="st"+(err?" err":"")};
+const dmsg=(m,err)=>{$("dmsg").textContent=m;$("dmsg").className="dm"+(err?" err":"")};
 function doImport(txt){const r=applyImport(txt);if(r&&!r.startsWith("ok:")){dmsg(r,true);return}dmsg("Importiert"+(r?" – unbekannt und übersprungen: "+r.slice(3):"")+". Lade neu …");setTimeout(()=>location.reload(),r?1800:300)}
 $("imp").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>doImport(String(rd.result||""));rd.onerror=()=>dmsg("Datei konnte nicht gelesen werden.",true);rd.readAsText(f)});
 $("pasteBtn").addEventListener("click",()=>{const v=$("box").value.trim();if(!v){dmsg("Erst JSON in das Feld einfügen.",true);return}doImport(v)});
 $("expBtn").addEventListener("click",async()=>{const txt=JSON.stringify({app:"depot-backup",at:new Date().toISOString(),state:S});$("box").value=txt;try{await navigator.clipboard.writeText(txt);dmsg("Backup steht im Feld und in der Zwischenablage. In Notizen oder Dateien sichern.")}catch(e){dmsg("Backup steht im Feld – markieren und kopieren.")}});
-let wipe=0;$("wipeBtn").addEventListener("click",()=>{if(Date.now()-wipe<4000){try{localStorage.removeItem(LS);localStorage.removeItem(HK)}catch(e){}location.reload()}else{wipe=Date.now();dmsg("Zum Löschen aller lokalen Daten innerhalb von 4 Sekunden erneut tippen.",true)}});
-{let v="home";try{v=sessionStorage.getItem("depot-view")||"home"}catch(e){}setView(D.length?v:"home")}
+let wipe=0;$("wipeBtn").addEventListener("click",()=>{if(Date.now()-wipe<4000){try{localStorage.removeItem(LS);localStorage.removeItem(HK);localStorage.removeItem(MKK)}catch(e){}location.reload()}else{wipe=Date.now();dmsg("Zum Löschen aller lokalen Daten innerhalb von 4 Sekunden erneut tippen.",true)}});
 render();
-const ro=new ResizeObserver(drawChart);ro.observe($("chart"));
+{let v="home";try{v=sessionStorage.getItem("depot-view")||"home"}catch(e){}setView(D.length?v:"home")}
+const ro=new ResizeObserver(drawChart);ro.observe($("chart"));const ro2=new ResizeObserver(()=>{if(document.body.dataset.view==="mkt")renderMarket()});ro2.observe($("kChart"));
+if("IntersectionObserver" in window)new IntersectionObserver(es=>{$("bar").classList.toggle("on",!es[0].isIntersecting)},{rootMargin:"-40px 0px 0px 0px"}).observe($("tot"));
+{const ptr=$("ptr");let py=null,pd=0;const rst=()=>{py=null;pd=0;ptr.style.height="0px";ptr.style.opacity="0";ptr.classList.remove("rdy")};
+ addEventListener("touchstart",e=>{py=(window.scrollY<=0&&!SHT&&e.touches.length===1&&!(e.target.closest&&e.target.closest(".fig,input,textarea,.tabs")))?e.touches[0].clientY:null;pd=0},{passive:true});
+ addEventListener("touchmove",e=>{if(py===null)return;if(window.scrollY>0){rst();return}pd=Math.max(0,(e.touches[0].clientY-py)*.5);ptr.style.height=Math.min(pd,64)+"px";ptr.style.opacity=String(Math.min(1,pd/56));ptr.classList.toggle("rdy",pd>=56)},{passive:true});
+ addEventListener("touchend",()=>{const go=py!==null&&pd>=56&&!$("sync").disabled;rst();if(go)sync()},{passive:true});addEventListener("touchcancel",rst,{passive:true})}
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
 </script>
