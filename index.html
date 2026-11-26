@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Krypto-Depot</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.coingecko.com; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Depot">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#06222e">
+<style>
+/* VOICE: nüchternes Finanz-Tool, Zahl zuerst
+   IDEA: Depotauszug mit Ampel-Gruppen, wie ein Broker-Report
+   PICTURE: 7-Tage-Wertkurve + gestapelter Gruppenbalken
+   COLOUR: Tinte auf fast Weiß, Gruppenfarben des Nutzers, nachts tiefes Blaugrün
+   LAYOUT: eine Spalte bis 860px, Kennzahlen als Raster */
+:root{color-scheme:light dark;--bg:light-dark(#f6f8f9,#06222e);--card:light-dark(#ffffff,#0b2d3b);--ink:light-dark(#06222e,#e6f0f3);--mut:light-dark(#5b6b73,#93a9b2);--ln:light-dark(#dde3e6,#1b4252);--soft:light-dark(#eef2f4,#103646);--up:light-dark(#3B6D11,#97C459);--dn:light-dark(#A32D2D,#F09595);--acc:light-dark(#06222e,#dff1f7)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,system-ui,sans-serif;overflow-x:clip}
+.wrap{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(4vw,12px,env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(4vw,12px,env(safe-area-inset-left))}
+.btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--ln);background:var(--soft);color:var(--ink);font-size:14px}
+textarea{font:12px/1.4 ui-monospace,Menlo,monospace;width:100%;min-height:110px;border:1px solid var(--ln);border-radius:8px;background:var(--soft);color:var(--ink);padding:8px}
+.det input{font:inherit;font-size:16px;width:100%;padding:4px 6px;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--ink)}
+h1,h2,.num{font-family:ui-rounded,-apple-system,system-ui,sans-serif}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sub{font-size:12px;color:var(--mut)}
+.tot{font-size:clamp(30px,8vw,44px);font-weight:600;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.d24{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.dn{color:var(--dn)}
+button{font:inherit;cursor:pointer}
+#sync{min-height:44px;padding:0 18px;border-radius:10px;border:0;background:var(--acc);color:var(--bg);font-weight:600}
+#sync:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #378ADD;outline-offset:2px}
+.st{font-size:12px;color:var(--mut);margin:6px 0 0;min-height:18px}.st.err{color:var(--dn)}
+nav{display:flex;gap:6px;overflow-x:auto;margin:12px 0 4px;padding-bottom:4px}
+nav a{flex:none;font-size:13px;color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:999px;background:var(--soft);min-height:36px}
+@media(min-width:900px){nav{position:sticky;top:0;background:var(--bg);z-index:2;padding-top:8px}}
+section{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-top:12px}
+h2{font-size:16px;font-weight:600;margin:0 0 8px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:8px;margin-top:12px}
+.k{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px 12px}
+.k .l{font-size:11px;color:var(--mut)}.k .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.k .s{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fig{position:relative;height:180px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.ax{display:flex;justify-content:space-between;font-size:11px;color:var(--mut)}
+.sum{display:flex;height:14px;border-radius:4px;overflow:hidden;margin:4px 0 6px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--mut)}
+.lg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.chip{flex:none;min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--ln);background:transparent;color:var(--ink);font-size:12px}
+.chip[aria-pressed=true]{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.cl{font-size:11px;color:var(--mut);margin:6px 0 2px}
+.h{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin:12px 0 3px;padding-bottom:3px;border-bottom:1px solid var(--ln)}
+.h span:last-child{font-weight:400;color:var(--mut)}
+.r{display:grid;grid-template-columns:62px minmax(0,1fr) 78px 42px 54px;gap:6px;align-items:center;min-height:26px;font-size:12px;width:100%;background:none;border:0;border-bottom:1px solid var(--soft);color:inherit;text-align:left;padding:0}
+.r .n{white-space:nowrap;font-weight:500}.r .n b{font-weight:400;color:var(--mut);margin-left:3px;font-size:11px}
+.f{height:8px;border-radius:2px}
+.v,.p,.c{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.p{color:var(--mut)}
+.rq{grid-template-columns:62px minmax(0,1fr) 40px 34px 34px 34px}.qb{position:relative;display:block;height:16px}.qb>i{position:absolute;left:0;top:0;height:16px;border-radius:3px;background:var(--ink);opacity:.14}.qb>.f{position:absolute;left:0;top:4px}
+.rqh{font-size:11px;color:var(--mut);min-height:20px;border:0}.rq .sc{font-weight:600}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px 12px;background:var(--soft);border-radius:8px;padding:8px 10px;margin:2px 0 6px;font-size:12px}
+.det span{color:var(--mut);font-size:11px;display:block}
+.det svg{width:100%;height:34px;grid-column:1/-1}
+.m{display:grid;grid-template-columns:132px minmax(0,1fr) 52px;gap:6px;align-items:center;min-height:22px;font-size:12px}
+.bw{height:8px;border-radius:2px;background:var(--soft)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 24px}
+.mv{display:grid;grid-template-columns:62px minmax(0,1fr) 60px;gap:6px;font-size:12px;min-height:22px;align-items:center}
+.qq{display:grid;grid-template-columns:58px 76px minmax(0,1fr) 62px;gap:6px;align-items:center;font-size:12px;min-height:28px;border-bottom:1px solid var(--soft)}
+.qq .mm{color:var(--mut);font-size:11px}
+.pl{font-size:11px;padding:2px 5px;border-radius:5px;text-align:center;white-space:nowrap}
+.s1{background:#EAF3DE;color:#27500A}.s2{background:#E6F1FB;color:#0C447C}.s3{background:#FAEEDA;color:#633806}.s4{background:#F1EFE8;color:#444441}
+.a{display:grid;grid-template-columns:62px 84px minmax(0,1fr) 84px;gap:8px;align-items:center;min-height:44px;font-size:12px}
+.a input{font:inherit;font-size:16px;width:100%;padding:6px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--soft);color:var(--ink);text-align:right}
+.ab{display:flex;height:8px}
+.ev{display:grid;grid-template-columns:62px 86px minmax(0,1fr);gap:8px;font-size:12px;padding:7px 0;border-bottom:1px solid var(--soft)}
+.ev .d{font-variant-numeric:tabular-nums;white-space:nowrap}.ev small{color:var(--mut);display:block}
+.note{font-size:11px;color:var(--mut);margin:8px 0 0}
+@media(prefers-reduced-motion:no-preference){.f{transition:width .4s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top" id="uebersicht">
+<div><div class="sub">Krypto-Depot Hub · <span id="npos"></span> Positionen</div><div class="tot num" id="tot">–</div><div class="d24" id="d24"></div><div class="sub" id="asof"></div></div>
+<button id="sync" type="button">Kurse synchronisieren</button>
+</div>
+<p class="st" id="st" role="status"></p>
+<section id="empty" hidden><h2>Noch keine Bestände</h2><p style="margin:0 0 8px">Die App enthält keine Mengen. Importiere unten unter „Daten“ einmal deine Datei depot.json. Sie bleibt nur auf diesem Gerät.</p><a href="#daten">Zu „Daten“</a></section>
+<div id="main">
+<section style="margin-top:8px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Depotverlauf</h2><div class="chips" id="cm" style="padding:0"></div></div>
+<div class="d24" id="chartD" style="margin:4px 0"></div>
+<div class="fig"><svg id="chart" role="img" aria-label="Verlauf des Depotwerts"></svg></div>
+<div class="ax"><span id="chartL"></span><span id="chartMid"></span><span id="chartR"></span></div>
+<p class="note" id="chartNote"></p>
+</section>
+<nav aria-label="Abschnitte"><a href="#uebersicht">Übersicht</a><a href="#positionen">Positionen</a><a href="#analyse">Analyse</a><a href="#rwa">RWA</a><a href="#plan">Aufstockplan</a><a href="#termine">Termine</a><a href="#daten">Daten</a></nav>
+
+<div class="kp" id="kp"></div>
+
+
+<section>
+<h2>Verteilung nach Qualität</h2>
+<div class="sum" id="sum"></div>
+<div class="lg" id="lg"></div>
+<div class="two" style="margin-top:12px">
+<div><div class="cl">Gewinner 24 h</div><div id="win"></div></div>
+<div><div class="cl">Verlierer 24 h</div><div id="los"></div></div>
+</div>
+</section>
+
+<section id="positionen">
+<h2>Positionen</h2>
+<div class="cl">Ansicht</div>
+<div class="chips" id="vw"></div>
+<div class="cl">Filter</div>
+<div class="chips" id="flt"></div>
+<div class="cl">Sortierung</div>
+<div class="chips" id="srt"></div>
+<div id="out"></div>
+<p class="note" id="qnote" hidden>Farbiger Balken = Score. Grauer Balken dahinter = dein Positionsgewicht (größte Position = volle Breite). Ragt Grau weit über die Farbe hinaus, ist die Position groß für ihren Score; ist Grau viel kürzer, ist sie klein dafür. Score 0–100, Modell aus dem Chat, keine Prognose und keine Finanzberatung. Sicherheit = Größe (Market Cap, 1 Mio. $ = 0 bis 50 Mrd. $ = 100), bis zu 30 % davon abhängig von Liquidität (Volumen zu Market Cap) und Umlaufanteil (Market Cap zu voll verwässert), live aus CoinGecko, minus Abzug für dokumentierte Ereignisse. Traktion = belegte Nutzung und institutionelle Anbindung aus unserer Recherche vom 25./26.11. (RWA.xyz, DefiLlama, Stablecoin-Daten, CoinMarketCap-Meldungen): ab 60 gemessene starke Marktstellung, 40 bis 55 datierte Zahlen oder namhafte Partner, 20 bis 35 Ankündigungen ohne Nutzungszahlen, 10 nichts Belegtes. Upside = Raum nach oben (kleinere Market Cap), Traktion und geringe Verwässerung. Gesamt = 45 % Sicherheit, 35 % Traktion, 20 % Upside.</p>
+<p class="note">K = Kernnarrativ (RWA, Finanzwelt on-chain, DeFi, Stablecoins und Zahlungen). Zeile antippen für Menge, Kurs und 7-Tage-Verlauf.</p>
+</section>
+
+<section id="analyse">
+<h2>Analyse der Verteilung</h2>
+<div class="cl">Konzentration</div>
+<div id="con"></div>
+<div class="cl" style="margin-top:12px">Positionsgrößen</div>
+<div id="bkt"></div>
+<div class="cl" style="margin-top:12px">Schieflagen in der Gewichtung</div>
+<div id="skew"></div>
+<div class="lg" style="margin-top:6px"><span><i style="background:#639922"></i>Kernthese DeFi-Lending</span><span><i style="background:#EF9F27"></i>Risky</span><span><i style="background:#E24B4A"></i>Tot</span></div>
+</section>
+
+<section id="rwa">
+<h2>RWA-Neubewertung</h2>
+<div class="sum" id="sig"></div>
+<div class="lg" id="sigl" style="margin-bottom:10px"></div>
+<div id="rwat"></div>
+<p class="note">RWA-Daten: fester Stand vom 25.11.2026 (RWA.xyz Distributed, DefiLlama). Sie werden nicht mitsynchronisiert; die Depotwerte daneben schon.</p>
+</section>
+
+<section id="plan">
+<h2>Aufstockplan</h2>
+<div id="planr"></div>
+<div class="h"><span>Summe Zukauf</span><span id="plans"></span></div>
+<div class="lg" style="margin-top:6px"><span><i style="background:#639922"></i>Bestand</span><span><i style="background:#97C459"></i>Zukauf</span><span>Nicht aufstocken: STABLE, ALGO, AVAX, NEAR</span></div>
+<p class="note">Beträge sind änderbar und bleiben auf diesem Gerät. Vorschlag aus dem Chat, keine Finanzberatung.</p>
+</section>
+
+<section id="termine">
+<h2>Termine und offene Punkte</h2>
+<div id="evs"></div>
+<p class="note">Aus deinen Angaben vom 25.11.2026 übernommen, hier nicht neu geprüft.</p>
+</section>
+</div>
+<section id="daten">
+<h2>Daten</h2>
+<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: eine Anfrage an CoinGecko mit den Coin-Namen, ohne Mengen.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<label class="btn" style="display:inline-flex;align-items:center;cursor:pointer">Datei importieren<input id="imp" type="file" accept=".json,application/json,text/plain" style="position:absolute;width:1px;height:1px;opacity:0"></label>
+<button class="btn" id="expBtn" type="button">Backup erstellen</button>
+<button class="btn" id="pasteBtn" type="button">Aus Feld importieren</button>
+<button class="btn" id="wipeBtn" type="button">Alles löschen</button>
+</div>
+<p class="st" id="dmsg" role="status"></p>
+<label class="cl" for="box">Backup oder Depot-JSON</label>
+<textarea id="box" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+<p class="note">Mengen änderst du auch direkt: unter „Positionen“ eine Zeile antippen. Ein Backup enthält Mengen, Kurse, Verlauf und Plan.</p>
+</section>
+</div>
+<script>
+{
+const SV="CoinGecko";
+const C={A:"#639922",B:"#85B7EB",C:"#EF9F27",D:"#E24B4A"};
+const GN={A:"Robust",B:"Mittelklasse",C:"Risky",D:"Tot"};
+const K=new Set("PYTH AVAX ONDO LINK XRP QNT AAVE ZRO CLEAR COMP S POLYX SYRUP STABLE PLUME COTI MORPHO W ENA XDP TRADE POL XLM".split(" "));
+const RAW=[
+["A","PYTH",0,.04862416,.35,"pyth-network"],["A","NEAR",0,2.93,3.23,"near"],["A","SOL",0,70.26,1.87,"solana"],["A","AVAX",0,6.58,.64,"avalanche-2"],["A","ONDO",0,.280683,1.23,"ondo-finance"],["A","LINK",0,9.06,2.83,"chainlink"],["A","ICP",0,2.02,.31,"internet-computer"],["A","XRP",0,.936494,2.05,"ripple"],["A","TAO",0,181.44,.75,"bittensor"],["A","QNT",0,145.82,1.26,"quant-network"],["A","ALGO",0,.078488,-.67,"algorand"],["A","AAVE",0,95.01,2.24,"aave"],["A","ADA",0,.146005,1.57,"cardano"],["A","XLM",0,.128358,4.35,"stellar"],["A","VET",0,.00487783,4.72,"vechain"],
+["B","ZRO",0,1.005,-2.14,"layerzero"],["B","CLEAR",0,.01833558,-4.96,"clearpool-2"],["B","COMP",0,17.77,2.96,"compound-governance-token"],["B","AKT",0,.465587,-.57,"akash-network"],["B","S",0,.02728014,-1.01,"sonic-3"],["B","FET",0,.108039,1.13,"fetch-ai"],["B","TIA",0,.325817,.07,"celestia"],["B","GRT",0,.01639301,1.86,"the-graph"],["B","POLYX",0,.02519786,4,"polymesh"],["B","PEAQ",0,.01942679,-1.39,"peaq-2"],["B","SYRUP",0,.065275,-8.46,"syrup"],["B","FIL",0,.545771,1.51,"filecoin"],["B","DASH",0,35.21,2.33,"dash"],["B","THETA",0,.128447,1.39,"theta-token"],["B","STABLE",0,.02477683,4.03,"stable-2"],["B","TFUEL",0,.00628831,-.22,"theta-fuel"],["B","CRO",0,.0399304,2.48,"crypto-com-chain"],["B","PLUME",0,.01071446,2.47,"plume"],["B","IOTA",0,.03150093,3.68,"iota"],["B","COTI",0,.00819448,1.39,"coti"],["B","MORPHO",0,1.57,.52,"morpho"],["B","W",0,.0082416,2.7,"wormhole"],["B","POL",0,.075965,1.03,"polygon-ecosystem-token"],["B","ENA",0,.099204,1.74,"ethena"],["B","POWR",0,.03918324,2.37,"power-ledger"],
+["C","PORTAL",0,.01235125,4.58,"portal-2"],["C","SUPRA",0,.0001067,-.93,"supra"],["C","DAG",0,.00277618,-4.88,"constellation-labs"],["C","XDP",0,.01371144,-3.71,"doppler-finance"],["C","DSYNC",0,.00467249,-2.31,"destra-network"],["C","XAI",0,.00511296,.86,"xai-blockchain"],["C","PAAL",0,.00533327,1.68,"paal-ai"],["C","TRADE",0,.01413261,-18.53,"polytrade"],["C","IRYS",0,.0162395,-.34,"irys"],["C","ALEPH",0,.01043469,-2.72,"aleph"],["C","ATLAS",0,.00008938,.16,"star-atlas"],["C","AKE",0,.00170202,-17.28,"akedo"],
+["D","ALU",0,.00255298,-1.43,"altura"]];
+const M0={XLM:[4556,6418,122],PYTH:[382.9,486.2,21.8],NEAR:[3851,3851,449],SOL:[41591,44825,3262],AVAX:[2937,3102,157],ONDO:[1367,2807,79],LINK:[6943,9054,271],ICP:[1131,1131,31],XRP:[59475,93623,1775],TAO:[2129,2129,117],QNT:[2123,2131,58],ALGO:[712,712,23],AAVE:[1467,1520,196],ADA:[5486,6570,267],VET:[419,419,7.2],ZRO:[402,1005,69],CLEAR:[20.5,26.1,.57],COMP:[178,178,10.6],AKT:[140,140,2.3],S:[119,128,21.4],FET:[250,293,52.8],TIA:[324,385,24.6],GRT:[179,190,8.2],POLYX:[33.8,33.8,1.1],PEAQ:[51,86.8,2.05],SYRUP:[76.2,82.8,8.5],FIL:[466,1068,46.9],DASH:[453,453,33.2],THETA:[128.5,128.5,3.4],STABLE:[446,2476,6.7],TFUEL:[47.4,47.4,.43],CRO:[2075,3955,5.8],PLUME:[75.3,107.1,8.5],IOTA:[150,158.6,4.2],COTI:[24.4,24.4,13.7],MORPHO:[1109,1570,11.2],W:[56.2,82.4,9.9],POL:[809.5,809.5,49.4],ENA:[1339,1488,182],POWR:[22.5,39.2,.82],PORTAL:[11,12.35,4.06],SUPRA:[5.2,8.83,.146],DAG:[10.97,10.97,.257],XDP:[13.7,137,5.49],DSYNC:[4.65,4.65,.525],XAI:[10.9,11.4,3.18],PAAL:[5.33,5.33,.115],TRADE:[1.41,1.41,.197],IRYS:[32.5,162.4,9.14],ALEPH:[3.66,5.22,.125],ATLAS:[2.37,3.22,.052],AKE:[38.8,170.2,16.2],ALU:[2.5,3.37,1.8]};
+const INST={XLM:[80,"RWA-Netzwerk Nr. 4 (4,86 Mrd. $, +29 %), Stablecoin-Volumen +50 %"],ONDO:[90,"RWA-Plattform Nr. 1 in Distributed (4,07 Mrd. $)"],SOL:[90,"RWA-Netzwerk Nr. 3, höchstes Stablecoin-Volumen (405,7 Mrd. $ in 30 T)"],MORPHO:[75,"meiste RWA-Sicherheiten im DeFi-Lending (843 Mio. $)"],XRP:[70,"RWA-Netzwerk Nr. 5, Zahlungsvolumen steigend"],LINK:[70,"Datenlieferant für Aave Horizon, selbst nicht messbar"],AAVE:[70,"RWA-Lending über V3 und Horizon"],POL:[65,"21 Mio. Stablecoin-Holder, SoFiUSD live"],ENA:[60,"drittgrößter Stablecoin (USDe, 4,94 Mrd. $)"],SYRUP:[55,"RWA-Plattform Nr. 12, rückläufig"],PYTH:[50,"11,49 Mio. $ wiederkehrender Umsatz (+86,5 % zum Vorquartal), Datenlieferant für LayerZero"],AVAX:[45,"RWA Nr. 6, nur 10 % distributed"],ZRO:[45,"Kakao Pay, Samsung Card und ZAN als Validatoren (25.11.), keine Nutzungszahlen"],QNT:[35,"von The Clearing House ausgewählt (09/2026), Zugang erst H1 2027"],W:[35,"Sunrise API für 90 tokenisierte US-Aktien und ETFs (16.11.)"],PLUME:[30,"RWA Nr. 16, rückläufig"],COMP:[30,"institutioneller USDG-Markt angekündigt, unbestätigt"],CRO:[30,"58.594 Transaktionen pro Tag im November, Rückkäufe laufen"],PEAQ:[30,"2,5 Mio. Maschinen aktiviert (11.11.)"],CLEAR:[30,"273 Mio. $ vergebene Kredite, Stand 11/2025"],AKT:[25,"GPU Forward Market angekündigt, Pilot Q1 2027"],ICP:[25,"staatlich gestütztes ChatT (Pakistan) startet Beta auf ICP"],ADA:[25,"59,4 Mio. $ Stablecoins (−14 %), Brale live"],S:[25,"USDC-Bridge von Circle, Nutzungszahlen veraltet"],POLYX:[25,"TruGolf-Cap-Table ab Q1 2027, keine Nutzungszahlen"],PAAL:[25,"11,4 Mio. Mitglieder in 21.000 Gruppen (09/2026)"],TAO:[20,"nur eine Subnet-Zahl (109.440 $ Gebühren im Oktober)"],NEAR:[20,"13 Mio. $ RWA, Mitglied in NVIDIAs AI-Allianz ohne genannte Rolle"],THETA:[20,"Weaver Labs nutzt EdgeCloud, keine Zahlen"],TFUEL:[20,"wird für EdgeCloud genutzt, keine Zahlen"],IOTA:[20,"LayerZero und BitGo angebunden, keine Nutzungszahlen"],XDP:[20,"FXRP-Vault mit Flare, keine Zahlen"],DSYNC:[20,"20.000 Nodes, Stand 10/2025"],ALEPH:[20,"Revolut-Listing und Ubisoft, Stand 2025"],ALGO:[15,"1 RWA-Asset, keine Stablecoin-Daten"],STABLE:[15,"33 Mio. $ Stablecoins auf der Chain"],FIL:[15,"nur Produktstarts für Endnutzer"],COTI:[15,"Uphold-Listing, Nutzung unbelegt"],PORTAL:[15,"Animoca stützt neues Team, keine Zahlen"],DAG:[15,"Partnerschaften ohne Datum, keine Zahlen"],TRADE:[15,"RWA-Marktplatz, Stand 2025"],VET:[10,"nichts Belegtes gefunden"],FET:[10,"nichts Belegtes gefunden"],TIA:[10,"nur Labor-Benchmark, keine Nutzung"],GRT:[10,"nichts Belegtes gefunden"],DASH:[10,"nichts Belegtes gefunden"],POWR:[10,"nichts Belegtes gefunden"],SUPRA:[10,"nichts Belegtes gefunden"],XAI:[10,"nichts Belegtes gefunden"],IRYS:[10,"nichts Belegtes gefunden"],ATLAS:[10,"Spielwirtschaft −71 %, Stand 2025"],AKE:[10,"nichts Belegtes gefunden"],ALU:[0,"kein laufender Betrieb belegt"]};
+const FLAG={ALU:[40,"Insider-Mint von 150 Mio. ALU (07/2025), Projekt übernommen"],IRYS:[20,"Unlock am 25.11. in Höhe von 59 % der Market Cap"],AKE:[20,"−41,9 % an einem Tag (20.11.), Unlock von 9,3 % des Umlaufs"],PORTAL:[15,"Delisting bei Phemex, Relaunch läuft"],CRO:[10,"Exploit mit Chain-Rollback am 30.08.2026"],POL:[10,"Diebstahl von 70,49 Mio. POL, Fork geplant"],STABLE:[10,"Unlock am 08.12.2026"],DASH:[10,"EU-Verbot von Privacy-Coins ab 10.07.2027"],ALEPH:[10,"45 % mehr Umlauf seit August"],POWR:[10,"Binance entfernte alle Margin-Paare (14.08.2026)"],ONDO:[5,"Unlock am 18.01.2027"],VET:[5,"Delisting bei CoinW (12.11.)"],COTI:[5,"DJED und SHEN werden zum 31.12. eingestellt"],THETA:[5,"Theta Labs will 30 Mio. THETA entstaken"],IOTA:[5,"Oracle-Vorfall bei Virtue (455.000 $), BloFin-Delisting"]};
+const ALL=RAW.map(r=>({g:r[0],t:r[1],q:0,u0:r[3],c0:r[4],id:r[5]}));
+const LS="depot-app-v1";
+let S={};try{S=JSON.parse(localStorage.getItem(LS)||"{}")||{}}catch(e){S={}}
+S.q=S.q||{};S.usd=S.usd||{};S.mk=S.mk||{};S.chg=S.chg||{};S.spark=S.spark||{};S.fx=S.fx||0.916781;
+S.plan=S.plan3||{XLM:200,SOL:150,AAVE:200,MORPHO:150,ONDO:150};
+ALL.forEach(d=>{d.q=Math.max(0,+S.q[d.t]||0)});const D=ALL.filter(d=>d.q>0);
+let UI={f:"all",s:"val",open:null,q:false,qs:"tot"};
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const usd=d=>S.usd[d.t]??d.u0;
+const chg=d=>S.at?S.chg[d.t]:d.c0;
+const eur=(x,n=2)=>x.toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n})+" €";
+const pc=(x,n=1)=>x.toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n})+" %";
+const sg=(x,n=1)=>(x>=0?"+":"−")+Math.abs(x).toLocaleString("de-DE",{minimumFractionDigits:n,maximumFractionDigits:n});
+const cls=x=>x>=0?"up":"dn";
+const qty=x=>x.toLocaleString("de-DE",{maximumFractionDigits:x<10?2:0});
+const prc=x=>x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:x<0.01?6:x<1?4:2})+" €";
+const d7=d=>{const s=S.spark[d.t];return s&&s.length>1&&s[0]>0?(usd(d)/s[0]-1)*100:null};
+const cl=x=>Math.max(0,Math.min(1,x));
+function score(d){const m=S.mk[d.t]||M0[d.t]||[0,0,0],mc=m[0],fdv=Math.max(m[1]||mc,mc),vol=m[2];
+ const size=mc>0?cl(Math.log10(mc)/4.7)*100:0,liq=mc>0?cl(Math.log10(vol/mc*100+1)/Math.log10(11))*100:0,sup=fdv>0?cl(mc/fdv)*100:0;
+ const fl=FLAG[d.t],ins=INST[d.t],iv=ins?ins[0]:10;
+ const s=Math.max(0,size*(.7+.0015*liq+.0015*sup)-(fl?fl[0]:0));let u=.5*(100-size)+.3*iv+.2*sup;if(d.g==="D")u*=.3;
+ return{s,i:iv,u,tot:.45*s+.35*iv+.2*u,ik:!!ins,ir:ins?ins[1]:"nicht recherchiert",fl:fl?fl[1]:"",mc,sup,liq:mc>0?vol/mc*100:0}}
+function calc(){D.forEach(d=>{d.p=usd(d)*S.fx;d.v=d.q*d.p;d.c=chg(d);d.w=d7(d);d.sc=score(d)});const T=D.reduce((a,d)=>a+d.v,0);D.forEach(d=>d.sh=d.v/T*100);return T}
+function series(){const N=48,o=new Array(N).fill(0);let any=false;
+ D.forEach(d=>{const sp=S.spark[d.t];if(sp&&sp.length>1){any=true;for(let i=0;i<N;i++)o[i]+=d.q*sp[Math.round(i*(sp.length-1)/(N-1))]*S.fx}else{for(let i=0;i<N;i++)o[i]+=d.v}});
+ if(!any)return null;o.push(D.reduce((a,d)=>a+d.v,0));return o}
+let HIST=Array.isArray(S.hist)?S.hist.slice():[];let MODE=null;
+const hkey=t=>new Date(t).toISOString().slice(0,13);
+const hist=()=>HIST.filter(x=>x&&x.t>0&&x.v>0).sort((a,b)=>a.t-b.t);
+const dfm=t=>new Date(t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" "+new Date(t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+function drawChart(){const s=$("chart"),W=s.clientWidth,H=s.clientHeight,h=hist(),d7s=series();
+ const mode=MODE||(h.length>=2?"hist":"7d");
+ $("cm").innerHTML=[["hist","Verlauf"],["7d","7 Tage"]].map(m=>`<button type="button" class="chip" data-m="${m[0]}" aria-pressed="${mode===m[0]}">${m[1]}</button>`).join("");
+ let pts=null;
+ if(mode==="hist"){if(h.length>=2){const t0=h[0].t,t1=h[h.length-1].t;pts=h.map(p=>({x:(p.t-t0)/((t1-t0)||1),v:p.v}))}}
+ else if(d7s)pts=d7s.map((v,i)=>({x:i/(d7s.length-1),v}));
+ const note=$("chartNote");
+ if(!pts||!W){s.innerHTML="";$("chartMid").textContent="";$("chartL").textContent="";$("chartR").textContent="";$("chartD").textContent="";
+  note.textContent=mode==="hist"?"Der Verlauf braucht mindestens zwei Messpunkte"+(h.length?" – der erste ist vom "+dfm(h[0].t):"")+". Jeder Sync speichert einen Punkt (höchstens einen pro Stunde).":"Die 7-Tage-Kurve erscheint nach dem ersten Sync.";return}
+ const vs=pts.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs),pt=8,pb=8,x=p=>3+p.x*(W-6),y=v=>pt+(mx-v)*(H-pt-pb)/((mx-mn)||1);
+ const pl=pts.map(p=>x(p).toFixed(1)+","+y(p.v).toFixed(1)).join(" ");const f=vs[0],l=vs[vs.length-1],col=l>=f?"#639922":"#E24B4A";
+ s.innerHTML=`<polygon points="3,${H} ${pl} ${W-3},${H}" fill="${col}" opacity=".12"/><polyline points="${pl}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`+(pts.length<=40&&mode==="hist"?pts.map(p=>`<circle cx="${x(p).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.5" fill="${col}"/>`).join(""):`<circle cx="${x(pts[pts.length-1]).toFixed(1)}" cy="${y(l).toFixed(1)}" r="3" fill="${col}"/>`);
+ $("chartMid").textContent="Hoch "+eur(mx,0)+" · Tief "+eur(mn,0);
+ $("chartD").innerHTML=`<span class="${cls(l-f)}">${sg(l-f,2)} € (${sg((l/f-1)*100,2)} %)</span> <span class="sub">${mode==="hist"?"seit Beginn der Aufzeichnung":"in 7 Tagen"}</span>`;
+ if(mode==="hist"){$("chartL").textContent=dfm(h[0].t);$("chartR").textContent=dfm(h[h.length-1].t);note.textContent=h.length+" gespeicherte Messpunkte. Jeder Sync speichert einen Punkt (höchstens einen pro Stunde); Käufe und Verkäufe verändern die Kurve mit."}
+ else{$("chartL").textContent="vor 7 Tagen";$("chartR").textContent="jetzt";note.textContent="Heutige Mengen mit den Kursen der letzten 7 Tage gerechnet – Käufe und Verkäufe sind nicht enthalten."}}
+function spark(d){const s=S.spark[d.t];if(!s||s.length<2)return"";const mn=Math.min(...s),mx=Math.max(...s);const p=s.map((v,i)=>(i*100/(s.length-1)).toFixed(1)+","+(30-(v-mn)*28/((mx-mn)||1)).toFixed(1)).join(" ");return`<svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline points="${p}" fill="none" stroke="${s[s.length-1]>=s[0]?"#639922":"#E24B4A"}" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`}
+const chTxt=c=>typeof c==="number"&&isFinite(c)?`<span class="${cls(c)}">${sg(c)} %</span>`:"–";
+function row(d,mx){const o=UI.open===d.t;
+ return`<button type="button" class="r" data-t="${d.t}" aria-expanded="${o}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span><div class="f" style="width:${Math.max(d.v/mx*100,1.5)}%;background:${C[d.g]}"></div></span><span class="v">${eur(d.v)}</span><span class="p">${pc(d.sh)}</span><span class="c">${chTxt(d.c)}</span></button>`+(o?`<div class="det"><div><span>Menge ${d.t} (änderbar, 0 entfernt)</span><input data-qt="${d.t}" type="number" inputmode="decimal" min="0" step="any" value="${d.q}" aria-label="Menge ${d.t}"></div><div><span>Kurs</span>${prc(d.p)}</div><div><span>24 h</span>${chTxt(d.c)}</div><div><span>7 Tage</span>${chTxt(d.w)}</div><div><span>Gruppe</span>${GN[d.g]}${K.has(d.t)?" · Kern":""}</div>${spark(d)}</div>`:"")}
+let QMX=1;
+function rowQ(d){const o=UI.open===d.t,c=d.sc,n=x=>Math.round(x);
+ return`<button type="button" class="r rq" data-t="${d.t}" aria-expanded="${o}"><span class="n">${d.t}${K.has(d.t)?"<b>K</b>":""}</span><span class="qb"><i style="width:${Math.max(d.v/QMX*100,1)}%"></i><div class="f" style="width:${Math.max(c[UI.qs],1.5)}%;background:${C[d.g]}"></div></span><span class="v sc">${n(c.tot)}</span><span class="p">${n(c.s)}</span><span class="p">${c.ik?n(c.i):"–"}</span><span class="p">${n(c.u)}</span></button>`+(o?`<div class="det"><div><span>Gesamt</span>${n(c.tot)} von 100</div><div><span>Sicherheit</span>${n(c.s)}</div><div><span>Traktion</span>${c.ik?n(c.i):"– (zählt als 10)"}</div><div><span>Upside</span>${n(c.u)}</div><div><span>Market Cap</span>${c.mc>=1000?(c.mc/1000).toLocaleString("de-DE",{maximumFractionDigits:2})+" Mrd. $":c.mc.toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio. $"}</div><div><span>Umlaufanteil</span>${pc(c.sup,0)}</div><div><span>Volumen zu Market Cap</span>${pc(c.liq)}</div><div><span>Dein Bestand</span>${qty(d.q)} ${d.t} · ${eur(d.v,0)} · ${pc(d.sh)}</div><div style="grid-column:1/-1"><span>Traktion: Beleg</span>${c.ir}</div>${c.fl?`<div style="grid-column:1/-1"><span>Abzug Sicherheit</span>${c.fl}</div>`:""}</div>`:"")}
+const SIG=[["stark","#639922","ONDO MORPHO SOL XRP"],["neutral","#85B7EB","AAVE ENA SYRUP"],["schwach","#EF9F27","AVAX PLUME ALGO NEAR"],["keine Daten","#B4B2A9","LINK CLEAR QNT POLYX STABLE XDP IOTA"]];
+const R=[["ONDO","Plattform #1 · 4,07 Mrd. $ · +0,8 %",1],["MORPHO","RWA-Lending #1 · 843 Mio. $",1],["SOL","Netzwerk #3 · 5,13 Mrd. $ · 98 % dist.",1],["XRP","Netzwerk #5 · 2,8–3,2 Mrd. $ · −6,8 %",1],["AAVE","V3 334 + Horizon 98 Mio. $",2],["ENA","Plattform #11 · 1,14 Mrd. $ · rückläufig",2],["SYRUP","Plattform #12 · 951 Mio. $ · rückläufig",2],["AVAX","Netzwerk #6 · 1,33 Mrd. $ · −15,1 % · 10 % dist.",3],["PLUME","Netzwerk #16 · 140 Mio. $ · rückläufig",3],["ALGO","Netzwerk #22 · 30 Mio. $ · 1 Asset",3],["NEAR","Netzwerk #26 · 13 Mio. $ · 2 Assets",3],["LINK","Oracle – nicht gemessen",4],["CLEAR","Seite ohne Daten",4],["QNT","nicht gemessen",4],["POLYX","nicht gelistet",4],["STABLE","nicht gelistet",4],["XDP","nicht gemessen",4],["IOTA","nicht gelistet",4]];
+const L=["","stark","neutral","schwach","k. D."];
+const EV=[["STABLE","2026-12-08","Token-Unlock"],["ONDO","2027-01-18","Token-Unlock"],["CLEAR","2027-02-17","Frist Tausch CPOOL → CLEAR (1:1)"],["DASH","2027-07-10","EU-Verbot von Privacy-Coins auf regulierten Plattformen"],["AKE","","Monatlicher Unlock von 2,11 Mrd. Token"],["ALU","","Kein offizieller Tausch ALU → KUVI gefunden"]];
+const by=t=>D.find(d=>d.t===t);
+function render(){
+ $("empty").hidden=D.length>0;$("main").hidden=!D.length;if(!D.length){$("tot").textContent="–";$("npos").textContent="0";return}
+ const T=calc();const mx=Math.max(...D.map(d=>d.v));
+ $("tot").textContent=eur(T);$("npos").textContent=D.length;
+ const prev=D.reduce((a,d)=>a+(typeof d.c==="number"?d.v/(1+d.c/100):d.v),0),dl=T-prev;
+ $("d24").innerHTML=`<span class="${cls(dl)}">${sg(dl,2)} € (${sg(dl/prev*100,2)} %)</span> <span class="sub">in 24 h</span>`;
+ $("asof").textContent=S.at?"Kurse: CoinGecko, "+new Date(S.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+" · in EUR umgerechnet":"Kurse: fester Stand vom 25./26.11.2026 bis zum ersten Sync";
+ const kS=D.filter(d=>K.has(d.t)).reduce((a,d)=>a+d.sh,0);const srt=D.slice().sort((a,b)=>b.v-a.v);
+ const ser=series();const w7=ser?(T/ser[0]-1)*100:null;
+ const gS=g=>D.filter(d=>d.g===g).reduce((a,d)=>a+d.sh,0);
+ const kp=[["Größte Position",srt[0].t,pc(srt[0].sh)+" · "+eur(srt[0].v,0)],["7 Tage",w7===null?"–":`<span class="${cls(w7)}">${sg(w7)} %</span>`,w7===null?"nach erstem Sync":"heutige Mengen"],["Ø Score",Math.round(D.reduce((a,d)=>a+d.sh*d.sc.tot,0)/100),"gewichtet nach Bestand"],["Kernnarrativ",pc(kS),"RWA · Zahlungen · DeFi"],["Robust",pc(gS("A")),D.filter(d=>d.g==="A").length+" Positionen"],["Risky + Tot",pc(gS("C")+gS("D")),D.filter(d=>d.g==="C"||d.g==="D").length+" Positionen"]];
+ $("kp").innerHTML=kp.map(k=>`<div class="k"><div class="l">${k[0]}</div><div class="v num">${k[1]}</div><div class="s">${k[2]}</div></div>`).join("");
+ $("sum").innerHTML=["A","B","C","D"].map(g=>`<div style="width:${gS(g)}%;background:${C[g]}"></div>`).join("");
+ $("lg").innerHTML=["A","B","C","D"].map(g=>`<span><i style="background:${C[g]}"></i>${GN[g]} ${pc(gS(g))}</span>`).join("");
+ const mvs=D.filter(d=>typeof d.c==="number").sort((a,b)=>b.c-a.c);
+ const mv=d=>`<div class="mv"><span><b style="font-weight:500">${d.t}</b></span><span class="sub">${eur(d.v,0)}</span><span class="c">${chTxt(d.c)}</span></div>`;
+ $("win").innerHTML=mvs.slice(0,4).map(mv).join("");$("los").innerHTML=mvs.slice(-4).reverse().map(mv).join("");
+ const has=t=>!!by(t);
+ const F=[["all","Alle"],["A","Robust"],["B","Mittelklasse"],["C","Risky"],["D","Tot"],["K","Kernnarrativ"]];
+ $("flt").innerHTML=F.map(f=>`<button type="button" class="chip" data-f="${f[0]}" aria-pressed="${UI.f===f[0]}">${f[1]}</button>`).join("");
+ $("vw").innerHTML=[[0,"Nach Investment"],[1,"Nach Qualität"]].map(f=>`<button type="button" class="chip" data-q="${f[0]}" aria-pressed="${(UI.q?1:0)===f[0]}">${f[1]}</button>`).join("");
+ const So=UI.q?[["tot","Gesamt"],["s","Sicherheit"],["i","Traktion"],["u","Upside"]]:[["val","Wert"],["c","24 h"],["w","7 Tage"],["az","A–Z"]];const cur=UI.q?UI.qs:UI.s;
+ $("srt").innerHTML=So.map(f=>`<button type="button" class="chip" data-s="${f[0]}" aria-pressed="${cur===f[0]}">${f[1]}</button>`).join("");
+ $("qnote").hidden=!UI.q;
+ const cmp=UI.q?((a,b)=>b.sc[UI.qs]-a.sc[UI.qs]):{val:(a,b)=>b.v-a.v,c:(a,b)=>(b.c??-999)-(a.c??-999),w:(a,b)=>(b.w??-999)-(a.w??-999),az:(a,b)=>a.t.localeCompare(b.t)}[UI.s];
+ const pass=d=>UI.f==="all"||(UI.f==="K"?K.has(d.t):d.g===UI.f);
+ QMX=mx;
+ const rw=UI.q?rowQ:(d=>row(d,mx));const qh=UI.q?`<div class="r rq rqh"><span>Coin</span><span></span><span class="v">Ges.</span><span class="p">Sich.</span><span class="p">Trakt.</span><span class="p">Ups.</span></div>`:"";
+ const hd=(g,rs,t)=>UI.q?`<div class="h"><span style="color:${C[g]}">${GN[g]} · ${rs.length}</span><span>Ø Score ${Math.round(rs.reduce((a,d)=>a+d.sc.tot,0)/rs.length)}</span></div>`:`<div class="h"><span style="color:${C[g]}">${GN[g]} · ${rs.length}</span><span>${eur(t)} · ${pc(t/T*100)}</span></div>`;
+ let o=qh;
+ (UI.f==="all"||UI.f==="K"?["A","B","C","D"]:[UI.f]).forEach(g=>{const rs=D.filter(d=>d.g===g&&pass(d)).sort(cmp);if(!rs.length)return;const t=rs.reduce((a,d)=>a+d.v,0);o+=hd(g,rs,t)+rs.map(rw).join("")});
+ $("out").innerHTML=o;
+ const top=n=>srt.slice(0,n).reduce((a,d)=>a+d.sh,0);
+ const M=[["Größte Position",srt[0].sh],["Top 5",top(5)],["Top 10",top(10)],["Kernnarrativ",kS]];
+ $("con").innerHTML=M.map(m=>`<div class="m"><span>${m[0]}</span><div class="bw"><div class="f" style="width:${m[1]}%;background:#888780"></div></div><span class="p">${pc(m[1])}</span></div>`).join("");
+ const B=[["über 5 %",d=>d.sh>=5],["2 bis 5 %",d=>d.sh>=2&&d.sh<5],["1 bis 2 %",d=>d.sh>=1&&d.sh<2],["unter 1 %",d=>d.sh<1]];
+ $("bkt").innerHTML=B.map(b=>{const rs=D.filter(b[1]),s=rs.reduce((a,d)=>a+d.sh,0);return`<div class="m"><span>${b[0]} · ${rs.length} Pos.</span><div class="bw"><div class="f" style="width:${s}%;background:#888780"></div></div><span class="p">${pc(s)}</span></div>`}).join("");
+ const SK=[["PORTAL","#EF9F27"],["SUPRA","#EF9F27"],["ALU","#E24B4A"],["AAVE","#639922"],["MORPHO","#639922"]];const SKh=SK.filter(x=>has(x[0]));const sm=Math.max(1,...SKh.map(x=>by(x[0]).v));
+ $("skew").innerHTML=SKh.map(x=>{const d=by(x[0]);return`<div class="m"><span>${d.t} · ${eur(d.v,0)}</span><div class="bw"><div class="f" style="width:${d.v/sm*100}%;background:${x[1]}"></div></div><span class="p">${pc(d.sh)}</span></div>`}).join("");
+ const sv=SIG.map(s=>[s[0],s[1],s[2].split(" ").reduce((a,t)=>a+(has(t)?by(t).sh:0),0)]);sv.push(["ohne RWA-Bezug","#D3D1C7",100-sv.reduce((a,x)=>a+x[2],0)]);
+ $("sig").innerHTML=sv.map(x=>`<div style="width:${x[2]}%;background:${x[1]}"></div>`).join("");
+ $("sigl").innerHTML=sv.map(x=>`<span><i style="background:${x[1]}"></i>${x[0]} ${pc(x[2])}</span>`).join("");
+ $("rwat").innerHTML=R.filter(r=>has(r[0])).map(r=>`<div class="qq"><span><b style="font-weight:500">${r[0]}</b></span><span class="v">${eur(by(r[0]).v)}</span><span class="mm">${r[1]}</span><span class="pl s${r[2]}">${L[r[2]]}</span></div>`).join("");
+ renderPlan();
+ const now=Date.now();
+ $("evs").innerHTML=EV.filter(e=>has(e[0])).map(e=>{let dt="laufend",sub="";if(e[1]){const t=new Date(e[1]+"T00:00:00");const n=Math.ceil((t-now)/864e5);dt=t.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"});sub=n>=0?"in "+n+" Tagen":"vorbei"}return`<div class="ev"><span><b style="font-weight:500">${e[0]}</b></span><span class="d">${dt}<small>${sub}</small></span><span>${e[2]}<small>Position: ${eur(by(e[0]).v,0)}</small></span></div>`}).join("");
+ drawChart();
+}
+function renderPlan(){const P=Object.keys(S.plan);const pv=t=>{const d=by(t);return d?d.v:0};const pm=Math.max(...P.map(t=>pv(t)+(+S.plan[t]||0)));
+ if(!$("planr").children.length)$("planr").innerHTML=P.map(t=>`<div class="a"><span><b style="font-weight:500">${t}</b>${by(t)?"":" <small style=\"color:var(--mut)\">neu</small>"}</span><label><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Zukauf ${t} in Euro</span><input id="pl-${t}" type="number" inputmode="numeric" min="0" step="50" value="${+S.plan[t]||0}"></label><div class="ab" id="pb-${t}"></div><span class="v" id="pv-${t}"></span></div>`).join("");
+ let sum=0;P.forEach(t=>{const a=+S.plan[t]||0,v=pv(t);sum+=a;$("pb-"+t).innerHTML=`<div style="width:${v/pm*100}%;background:#639922;border-radius:2px 0 0 2px"></div><div style="width:${a/pm*100}%;background:#97C459;border-radius:0 2px 2px 0"></div>`;$("pv-"+t).textContent="→ "+eur(v+a,0)});
+ $("plans").textContent=eur(sum)+(sum>1000?" · über Budget 1.000 €":sum<1000?" · "+eur(1000-sum,0)+" frei":" · Budget 1.000 €")}
+$("planr").addEventListener("input",e=>{const m=e.target.id&&e.target.id.match(/^pl-(.+)$/);if(!m)return;S.plan[m[1]]=Math.max(0,+e.target.value||0);S.plan3=S.plan;save();renderPlan()});
+$("flt").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(b){UI.f=b.dataset.f;render()}});
+$("srt").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){if(UI.q)UI.qs=b.dataset.s;else UI.s=b.dataset.s;render()}});
+$("vw").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){UI.q=b.dataset.q==="1";UI.open=null;render()}});
+$("out").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b){UI.open=UI.open===b.dataset.t?null:b.dataset.t;render()}});
+$("cm").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b){MODE=b.dataset.m;drawChart()}});
+function putSnap(sn){const k=hkey(sn.t);const i=HIST.findIndex(x=>x&&hkey(x.t)===k);if(i>=0)HIST[i]=sn;else HIST.push(sn)}
+function saveSnap(T){putSnap({t:Date.now(),v:+T.toFixed(2)});S.hist=hist().slice(-1500);save();drawChart()}
+const st=(m,err)=>{$("st").textContent=m;$("st").className="st"+(err?" err":"")};
+const API="https://api.coingecko.com/api/v3";
+const down=(a,n)=>{if(a.length<=n)return a;const o=[];for(let i=0;i<n;i++)o.push(a[Math.round(i*(a.length-1)/(n-1))]);return o};
+async function sync(){const b=$("sync");if(!D.length){st("Erst Bestände importieren.",true);return}b.disabled=true;st("Lade Kurse …");
+ try{const ids=D.map(d=>d.id).join(",");
+  const [fr,mr]=await Promise.all([fetch(API+"/simple/price?ids=tether&vs_currencies=eur,usd",{cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"}),fetch(API+"/coins/markets?vs_currency=usd&ids="+encodeURIComponent(ids)+"&per_page=250&page=1&sparkline=true&price_change_percentage=24h",{cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"})]);
+  if(fr.status===429||mr.status===429){st("CoinGecko-Limit erreicht – in etwa einer Minute erneut versuchen.",true);return}
+  if(!fr.ok||!mr.ok){st("CoinGecko antwortet mit Fehler "+(mr.ok?fr.status:mr.status)+" – später erneut versuchen.",true);return}
+  const fj=await fr.json(),arr=await mr.json();const rate=fj&&fj.tether?Number(fj.tether.eur)/Number(fj.tether.usd):0;
+  if(!(rate>0)||!Array.isArray(arr)){st("Unerwartete Antwort von CoinGecko.",true);return}
+  const res={};arr.forEach(c=>{if(c&&c.id)res[c.id]=c});const miss=[];let n=0;
+  D.forEach(d=>{const c=res[d.id],pu=c&&Number(c.current_price);
+   if(pu>0){S.usd[d.t]=pu;n++;const ch=Number(c.price_change_percentage_24h);if(isFinite(ch))S.chg[d.t]=ch;else delete S.chg[d.t];
+    const mc=Number(c.market_cap)/1e6,fd=Number(c.fully_diluted_valuation)/1e6,vo=Number(c.total_volume)/1e6;if(mc>0)S.mk[d.t]=[+mc.toFixed(2),+(fd>0?fd:mc).toFixed(2),+(vo>0?vo:0).toFixed(3)];
+    const sp=c.sparkline_in_7d&&Array.isArray(c.sparkline_in_7d.price)?c.sparkline_in_7d.price.map(Number).filter(x=>x>0):[];if(sp.length>1)S.spark[d.t]=down(sp,48).map(x=>+x.toPrecision(5));else delete S.spark[d.t]}
+   else miss.push(d.t)});
+  if(!n){st("Keine Kurse erhalten.",true);return}
+  S.at=Date.now();S.fx=rate;save();render();saveSnap(D.reduce((a,d)=>a+d.v,0));
+  st(n+" von "+D.length+" Kursen aktualisiert · EUR/USD "+(1/rate).toFixed(4).replace(".",",")+"."+(miss.length?" Ohne Kurs (alter Wert bleibt): "+miss.join(", ")+".":""),!!miss.length);
+ }catch(e){st(navigator.onLine===false?"Offline – der Sync braucht Internet.":"Abruf fehlgeschlagen – später erneut versuchen.",true)}finally{b.disabled=false}}
+$("sync").addEventListener("click",sync);
+$("out").addEventListener("change",e=>{const t=e.target.dataset&&e.target.dataset.qt;if(!t)return;S.q[t]=Math.max(0,+e.target.value||0);save();location.reload()});
+function applyImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return"Kein gültiges JSON."}
+ if(!o||typeof o!=="object")return"Kein gültiges JSON.";
+ if(o.app==="depot-backup"&&o.state&&typeof o.state==="object"){S=o.state;save();return""}
+ const h=o.holdings&&typeof o.holdings==="object"?o.holdings:o;const known=new Set(ALL.map(d=>d.t));let n=0;const skip=[];
+ Object.keys(h).forEach(k=>{const t=String(k).toUpperCase(),v=Number(h[k]);if(!isFinite(v)||v<0)return;if(known.has(t)){S.q[t]=v;n++}else skip.push(t)});
+ if(!n)return"Keine bekannten Coins gefunden.";save();return skip.length?"ok:"+skip.join(", "):""}
+const dmsg=(m,err)=>{$("dmsg").textContent=m;$("dmsg").className="st"+(err?" err":"")};
+function doImport(txt){const r=applyImport(txt);if(r&&!r.startsWith("ok:")){dmsg(r,true);return}dmsg("Importiert"+(r?" – unbekannt und übersprungen: "+r.slice(3):"")+". Lade neu …");setTimeout(()=>location.reload(),r?1800:300)}
+$("imp").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>doImport(String(rd.result||""));rd.onerror=()=>dmsg("Datei konnte nicht gelesen werden.",true);rd.readAsText(f)});
+$("pasteBtn").addEventListener("click",()=>{const v=$("box").value.trim();if(!v){dmsg("Erst JSON in das Feld einfügen.",true);return}doImport(v)});
+$("expBtn").addEventListener("click",async()=>{const txt=JSON.stringify({app:"depot-backup",at:new Date().toISOString(),state:S});$("box").value=txt;try{await navigator.clipboard.writeText(txt);dmsg("Backup steht im Feld und in der Zwischenablage. In Notizen oder Dateien sichern.")}catch(e){dmsg("Backup steht im Feld – markieren und kopieren.")}});
+let wipe=0;$("wipeBtn").addEventListener("click",()=>{if(Date.now()-wipe<4000){try{localStorage.removeItem(LS)}catch(e){}location.reload()}else{wipe=Date.now();dmsg("Zum Löschen aller lokalen Daten innerhalb von 4 Sekunden erneut tippen.",true)}});
+render();
+const ro=new ResizeObserver(drawChart);ro.observe($("chart"));
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
+</body>
+</html>
