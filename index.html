@@ -232,6 +232,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 .r{grid-template-columns:92px minmax(0,1fr) 78px 42px 54px}.rq{grid-template-columns:92px minmax(0,1fr) 40px 34px 34px 34px}.mvr{grid-template-columns:92px minmax(0,1fr) auto 76px!important}.hm{grid-template-columns:96px repeat(4,minmax(0,1fr))}.hn{flex-direction:row!important;align-items:center!important;justify-content:flex-start!important}.hn>span{display:flex;flex-direction:column;line-height:1.15}
 .lgb{margin:12px 0;padding:12px;border-radius:12px;background:var(--fill);font-size:14px;line-height:1.4}.lgb.hot{background:color-mix(in srgb,#FF3B30 12%,transparent)}.lgw{margin-top:6px;font-size:13px;font-weight:600;color:#C2410C}@media (prefers-color-scheme:dark){.lgw{color:#FFB25C}}
 .sgb{width:100%;border:0;background:none;color:var(--ink);text-align:left;font:inherit}.sgb .sv em{display:block;font-style:normal;font-size:11px;font-weight:700;color:#FF9F0A}
+.old{opacity:.55}#tbP li{margin:4px 0}
 .upd{display:block;width:100%;border:0;border-radius:12px;margin-top:10px;padding:10px 12px;background:var(--acc);color:#fff;font-size:13px;font-weight:600;text-align:left}.upd[hidden]{display:none}
 .kb{display:inline-block;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:#007AFF;border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:1px}
 </style>
@@ -248,6 +249,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <p class="st" id="st" role="status"></p>
 <button type="button" class="alr" id="alr" hidden></button>
 <button type="button" class="alr" id="lag" style="background:color-mix(in srgb,#FF3B30 14%,transparent)" hidden></button>
+<button type="button" class="alr" id="tb" style="background:var(--card);font-weight:500" hidden></button>
 <button type="button" class="upd" id="upd" hidden>Neue Version geladen – antippen zum Neustart</button>
 <section id="empty" hidden><h2>Noch keine Bestände</h2><p style="margin:0 0 8px">Die App enthält keine Mengen. Importiere über das Zahnrad oben rechts einmal deine Datei depot.json. Sie bleibt nur auf diesem Gerät.</p><button class="btn" id="goData" type="button">Zu „Daten“</button></section>
 <div id="main">
@@ -296,6 +298,13 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 </section>
 
 <div class="chips seg subn" id="mktSub" data-v="mkt"></div>
+<section id="tbS" data-v="mkt" data-s="rad" hidden>
+<h2>Tagesbericht</h2>
+<div class="sub" id="tbD"></div>
+<div id="tbH" style="font-size:17px;font-weight:700;margin:6px 0 4px;line-height:1.3"></div>
+<ul id="tbP" style="margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.45"></ul>
+<p class="note" id="tbN"></p>
+</section>
 <section id="markt" data-v="mkt" data-s="rad">
 <h2>Altseason-Radar</h2>
 <div style="display:flex;align-items:baseline;gap:10px"><div class="shv num" id="asiV" style="margin:0">–</div><div class="rh" id="rHead" style="margin:0"></div></div>
@@ -536,7 +545,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <p class="dm" id="dmsg" role="status"></p>
 <label class="cl" for="box">Backup oder Depot-JSON</label>
 <textarea id="box" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
-<p class="note">Mengen änderst du auch direkt: unter „Positionen“ eine Zeile antippen. Ein Backup enthält Mengen, Kurse, Einstellungen, Kursmarken, Ziele und die eigenen Aufzeichnungen (Depotverlauf, Altcoin-Index, Marktkapitalisierung, Marktanteile). Die geladene Kurshistorie ist nicht enthalten, sie lässt sich neu laden. Eine Datei mit „research“ aktualisiert die Bewertungsgrundlagen.</p>
+<p class="note">Mengen änderst du auch direkt: unter „Positionen“ eine Zeile antippen. Ein Backup enthält Mengen, Kurse, Einstellungen, Kursmarken, Ziele und die eigenen Aufzeichnungen (Depotverlauf, Altcoin-Index, Marktkapitalisierung, Marktanteile). Die geladene Kurshistorie ist nicht enthalten, sie lässt sich neu laden. Eine Recherche-Datei („research“) aktualisiert Bewertungsgrundlagen, Tagesbericht und Coin-Notizen; sie ändert keine Mengen.</p>
 </section>
 </div>
 <div id="shBg" hidden></div>
@@ -913,7 +922,8 @@ $("sync").addEventListener("click",sync);
 function applyImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return"Kein gültiges JSON."}
  if(!o||typeof o!=="object")return"Kein gültiges JSON.";
  if(o.app==="depot-backup"&&o.state&&typeof o.state==="object"){S=o.state;save();if(o.rec&&typeof o.rec==="object"){["asi","cap","dom","mine"].forEach(k=>{if(Array.isArray(o.rec[k]))MK[k]=o.rec[k].filter(x=>x&&isFinite(+x.t)).slice(-900)});saveM()}return""}
- if(o.research&&typeof o.research==="object"){{const R=o.research,O=S.rs&&typeof S.rs==="object"?S.rs:{},up=x=>{const r={};if(x&&typeof x==="object")Object.keys(x).forEach(k=>r[String(k).toUpperCase()]=x[k]);return r};S.rs={asof:/^\d{4}-\d\d-\d\d$/.test(R.asof||"")?R.asof:(O.asof||""),inst:Object.assign({},O.inst,up(R.inst)),flag:Object.assign({},O.flag,up(R.flag)),at:Object.assign({},O.at,up(R.at)),coins:(Array.isArray(O.coins)?O.coins:[]).concat(Array.isArray(R.coins)?R.coins:[]).slice(-60),core:(Array.isArray(O.core)?O.core:[]).concat(Array.isArray(R.core)?R.core:[]).slice(-80),notes:(Array.isArray(R.notes)?R.notes:[]).concat(Array.isArray(O.notes)?O.notes:[]).slice(0,20)}};save();return""}
+ if(o.research&&typeof o.research==="object"){{const R=o.research,O=S.rs&&typeof S.rs==="object"?S.rs:{},up=x=>{const r={};if(x&&typeof x==="object")Object.keys(x).forEach(k=>r[String(k).toUpperCase()]=x[k]);return r};S.rs={asof:/^\d{4}-\d\d-\d\d$/.test(R.asof||"")?R.asof:(O.asof||""),inst:Object.assign({},O.inst,up(R.inst)),flag:Object.assign({},O.flag,up(R.flag)),at:Object.assign({},O.at,up(R.at)),coins:(Array.isArray(O.coins)?O.coins:[]).concat(Array.isArray(R.coins)?R.coins:[]).slice(-60),core:(Array.isArray(O.core)?O.core:[]).concat(Array.isArray(R.core)?R.core:[]).slice(-80),notes:(Array.isArray(R.notes)?R.notes:[]).concat(Array.isArray(O.notes)?O.notes:[]).slice(0,20),mk:O.mk||null,cn:Object.assign({},O.cn)};
+ const dy=R.daily;if(dy&&typeof dy==="object"&&/^\d{4}-\d\d-\d\d$/.test(dy.date||"")){const cut=(x,n)=>String(x==null?"":x).slice(0,n);if(dy.market&&typeof dy.market==="object")S.rs.mk={date:dy.date,head:cut(dy.market.head,140),points:(Array.isArray(dy.market.points)?dy.market.points:[]).slice(0,8).map(x=>cut(x,320)),src:(Array.isArray(dy.market.sources)?dy.market.sources:[]).slice(0,8).map(x=>cut(x,60))};if(dy.coins&&typeof dy.coins==="object")Object.keys(dy.coins).forEach(k=>{const t=String(k).toUpperCase(),v=cut(dy.coins[k],320);if(v)S.rs.cn[t]=[dy.date,v];else delete S.rs.cn[t]})}};save();return""}
  const h=o.holdings&&typeof o.holdings==="object"?o.holdings:o;const known=new Set(ALL.map(d=>d.t));let n=0;const skip=[];
  Object.keys(h).forEach(k=>{const t=String(k).toUpperCase(),v=Number(h[k]);if(!isFinite(v)||v<0)return;if(known.has(t)){S.q[t]=v;n++}else skip.push(t)});
  if(!n)return"Keine bekannten Coins gefunden.";save();return skip.length?"ok:"+skip.join(", "):""}
@@ -1148,7 +1158,7 @@ let rzT=0;window.addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout
 const ICOK=/^https:\/\/(coin-images|assets)\.coingecko\.com\/coins\/images\/[\w\/.%-]+(\?\d+)?$/;
 function ico(t,lg){const u=S.img&&S.img[t];return`<span class="ci${lg?" lg":""}" aria-hidden="true">${esc(String(t).slice(0,lg?3:1))}${u&&ICOK.test(u)?`<img src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>`}
 function icoLoad(){try{if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage({ico:1})}catch(e){}Object.values(S.img||{}).forEach((u,i)=>{if(ICOK.test(u))setTimeout(()=>{const im=new Image();im.referrerPolicy="no-referrer";im.src=u},200+i*60)})}
-const VER="15",VERD="27.11.2026";
+const VER="16",VERD="27.11.2026";
 function drawMv(pass){const P=[["1","24 h",8],["7","7 T",20],["30","30 T",40],["90","90 T",60]],cur=P.find(p=>p[0]===UI.mp)||P[0],N=+cur[0];
  $("srt").innerHTML=P.map(f=>`<button type="button" class="chip" data-s="${f[0]}" aria-pressed="${cur[0]===f[0]}">${f[1]}</button>`).join("");$("qnote").hidden=true;
  const rows=D.filter(pass).map(d=>{const r=retN(d,N);return{d,r,e:r!==null&&isFinite(r)&&r>-100?d.v-d.v/(1+r/100):0}}),tot=rows.reduce((a,x)=>a+x.e,0),ok=rows.filter(x=>x.r!==null&&isFinite(x.r)),up=ok.filter(x=>x.r>=0).sort((a,b)=>b.r-a.r),dn=ok.filter(x=>x.r<0).sort((a,b)=>a.r-b.r),no=rows.filter(x=>x.r===null||!isFinite(x.r)),srt=ok.map(x=>x.r).sort((a,b)=>a-b),med=srt.length?(srt[Math.floor((srt.length-1)/2)]+srt[Math.ceil((srt.length-1)/2)])/2:null,bt=btcRet(N);
@@ -1256,14 +1266,18 @@ function lage(d){const m=S.mk[d.t]||M0[d.t],r1=retN(d,1),r7=retN(d,7),r30=retN(d
 function lageList(){return D.map(d=>({d,L:lage(d)})).filter(x=>x.L.lvl>0||x.L.stale).sort((a,b)=>b.L.lvl-a.L.lvl||Math.abs(b.L.r1||0)-Math.abs(a.L.r1||0))}
 const dDE=s=>new Date(s+"T12:00:00").toLocaleDateString("de-DE");
 const sheetHTML0=sheetHTML;
-sheetHTML=function(d){const h=sheetHTML0(d),L=lage(d),blk=`<div class="lgb${L.lvl===2?" hot":""}"><div class="cl" style="margin:0 0 4px">Lage aus aktuellen Daten</div><div>${esc(L.txt)}</div>${L.stale?`<div class="lgw">Die Texte zu Traktion und Risiko stammen vom ${dDE(L.rd)}${L.since!==null&&isFinite(L.since)?" (Kurs seitdem "+sg(L.since,0)+" %)":""} und berücksichtigen diese Bewegung nicht. Recherche-Update nötig.</div>`:`<div class="sub" style="margin-top:4px">Recherche-Stand der Bewertungstexte: ${dDE(L.rd)}</div>`}</div>`,i=h.indexOf('<div class="sg">');return i<0?h+blk:h.slice(0,i)+blk+h.slice(i)};
+sheetHTML=function(d){const h=sheetHTML0(d),L=lage(d),blk=`<div class="lgb${L.lvl===2?" hot":""}"><div class="cl" style="margin:0 0 4px">Lage aus aktuellen Daten</div><div>${esc(L.txt)}</div>${(()=>{const c=S.rs&&S.rs.cn&&S.rs.cn[d.t];if(!c)return"";const age=Math.floor((Date.now()-new Date(c[0]+"T12:00:00").getTime())/864e5);return`<div class="${age>7?"old":""}" style="margin-top:8px;padding-top:8px;border-top:.5px solid var(--ln)"><b>Recherche-Notiz vom ${dDE(c[0])}${age>7?" (älter als eine Woche)":""}:</b> ${esc(c[1])}</div>`})()}${L.stale?`<div class="lgw">Die Texte zu Traktion und Risiko stammen vom ${dDE(L.rd)}${L.since!==null&&isFinite(L.since)?" (Kurs seitdem "+sg(L.since,0)+" %)":""} und berücksichtigen diese Bewegung nicht. Recherche-Update nötig.</div>`:`<div class="sub" style="margin-top:4px">Recherche-Stand der Bewertungstexte: ${dDE(L.rd)}</div>`}</div>`,i=h.indexOf('<div class="sg">');return i<0?h+blk:h.slice(0,i)+blk+h.slice(i)};
 function lagePrompt(xs){const now=new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"});return"Recherche-Update für mein Krypto-Depot bitte. Diese Coins sind laut App auffällig (Stand "+now+"):\n"+xs.map(x=>{const L=x.L,i=INST[x.d.t],fl=FLAG[x.d.t];return"- "+x.d.t+" ("+x.d.id+"): 24 h "+sgn(L.r1)+" %, 7 T "+sgn(L.r7)+" %, 30 T "+sgn(L.r30)+" %"+(L.to!==null?", Umsatz "+Math.round(L.to)+" % der Marktkap.":"")+". Bisher hinterlegt – Traktion: "+(i?i[0]+" / "+i[1]:"keine")+"; Risiko: "+(fl?fl[0]+" / "+fl[1]:"keines")+"; Recherche vom "+dDE(L.rd)+"."}).join("\n")+"\nBitte Ursache und aktuelle Lage prüfen und mir eine Recherche-Datei zum Importieren geben (Traktion, Risiko-Abzug, Notiz, Datum je Coin)."}
-function drawLage(){const xs=lageList(),hot=xs.filter(x=>x.L.lvl===2),e=$("lag");e.hidden=!hot.length;e.textContent=hot.length?"Auffällig: "+hot.slice(0,4).map(x=>x.d.t+" "+sgn(x.L.r1,0)+" %").join(" · ")+(hot.length>4?" · +"+(hot.length-4):""):"";
+function drawTb(){const m=S.rs&&S.rs.mk,sec=$("tbS"),b=$("tb");if(!m||!m.date){sec.hidden=true;b.hidden=true;return}const age=Math.floor((Date.now()-new Date(m.date+"T12:00:00").getTime())/864e5),old=age>3;
+ sec.hidden=false;sec.classList.toggle("old",old);$("tbD").textContent="Recherche vom "+dDE(m.date)+(age<=0?" (heute)":age===1?" (gestern)":" (vor "+age+" Tagen)")+(old?" – veraltet, neuen Bericht importieren":"");$("tbH").textContent=m.head||"";$("tbP").innerHTML=(m.points||[]).map(x=>`<li>${esc(x)}</li>`).join("");$("tbN").textContent=(m.src&&m.src.length?"Quellen: "+m.src.join(", ")+". ":"")+"Der Bericht kommt aus der täglichen Recherche-Datei und ändert sich nur durch einen Import.";
+ b.hidden=old||!m.head;b.textContent="Tagesbericht "+dDE(m.date).slice(0,6)+" · "+(m.head||"")}
+function drawLage(){drawTb();const xs=lageList(),hot=xs.filter(x=>x.L.lvl===2),e=$("lag");e.hidden=!hot.length;e.textContent=hot.length?"Auffällig: "+hot.slice(0,4).map(x=>x.d.t+" "+sgn(x.L.r1,0)+" %").join(" · ")+(hot.length>4?" · +"+(hot.length-4):""):"";
  const b=$("byLage");if(!b||!b.offsetParent&&document.body.dataset.view!=="plan")return;const need=xs.filter(x=>x.L.stale);
  b.innerHTML=xs.length?xs.slice(0,12).map(x=>`<button type="button" class="sig sgb" data-t="${x.d.t}"><i style="background:${x.L.lvl===2?"#FF3B30":"#FF9F0A"}"></i><b>${ico(x.d.t)}${x.d.t}</b><span class="sv">${sgn(x.L.r1)} % heute${x.L.stale?"<em>Recherche nötig</em>":""}</span><small>${esc(x.L.txt)}</small></button>`).join(""):'<div class="sub">Keine auffälligen Bewegungen in deinen Positionen.</div>';
  $("byReq").hidden=!need.length;$("byReqT").textContent=need.length?need.length+(need.length===1?" Coin hat sich":" Coins haben sich")+" seit der letzten Recherche stark bewegt. Die hinterlegten Texte und Abzüge passen dort nicht mehr sicher zur Lage.":""}
 $("byLage").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)openSheet(b.dataset.t)});
 $("byCopy").addEventListener("click",async()=>{const xs=lageList().filter(x=>x.L.stale),t=lagePrompt(xs.length?xs:lageList()),bx=$("byCopyT");bx.value=t;bx.hidden=false;try{await navigator.clipboard.writeText(t);$("byCopyM").textContent="Kopiert. Im Chat mit Claude einfügen; die Antwort-Datei über das Zahnrad importieren."}catch(e){bx.focus();bx.select();$("byCopyM").textContent="Text markiert – bitte kopieren und im Chat mit Claude einfügen."}});
+$("tb").addEventListener("click",()=>{SUB.mkt="rad";setView("mkt");applySub();renderMarket();drawViz();window.scrollTo(0,0)});
 $("lag").addEventListener("click",()=>{SUB.plan="buy";setView("plan");applySub();drawViz()});
 applySub();
 render();bgRender();
