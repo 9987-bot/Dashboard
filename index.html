@@ -225,6 +225,8 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 #uebersicht{position:relative}#uebersicht .acts{position:absolute;top:0;right:0}#uebersicht>div:first-child{width:100%}#uebersicht>div:first-child>.sub:first-child{min-height:44px;display:flex;align-items:center;gap:4px}
 .mt .mc{display:block;width:100%}
 .subn .chip{font-size:13px;padding-left:4px;padding-right:4px;white-space:nowrap}
+#byKp{display:grid;grid-template-columns:1fr 1fr;gap:8px}#byKp .k{background:var(--fill);border-radius:14px;padding:12px}#byKp .l,#byKp .x{font-size:12px;color:var(--mut);line-height:1.3}#byKp .v{font-size:22px;font-weight:700;text-align:left}
+.byr{padding:10px 0;border-top:.5px solid var(--ln)}.byr .tgb{margin:0 0 4px}.byr .tgb .f{max-width:none}
 .upd{display:block;width:100%;border:0;border-radius:12px;margin-top:10px;padding:10px 12px;background:var(--acc);color:#fff;font-size:13px;font-weight:600;text-align:left}.upd[hidden]{display:none}
 .kb{display:inline-block;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:#007AFF;border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:1px}
 </style>
@@ -243,7 +245,6 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <button type="button" class="upd" id="upd" hidden>Neue Version geladen – antippen zum Neustart</button>
 <section id="empty" hidden><h2>Noch keine Bestände</h2><p style="margin:0 0 8px">Die App enthält keine Mengen. Importiere über das Zahnrad oben rechts einmal deine Datei depot.json. Sie bleibt nur auf diesem Gerät.</p><button class="btn" id="goData" type="button">Zu „Daten“</button></section>
 <div id="main">
-<div class="mst" id="mst" data-v="home"></div>
 <section style="margin-top:12px" data-v="home">
 <h2>Depotverlauf</h2>
 <div class="d24" id="chartD" style="margin:0 0 6px;min-height:22px"></div>
@@ -255,6 +256,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 </section>
 
 <div class="kp" id="kp" data-v="home"></div>
+<div class="mst" id="mst" data-v="home"></div>
 <section data-v="home">
 <h2>Depot-Karte</h2>
 <div class="chips seg" id="tmM"></div>
@@ -422,6 +424,28 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <p class="note" id="nrNote"></p>
 </section>
 <div class="chips seg subn" id="planSub" data-v="plan"></div>
+<section id="buy" data-v="plan" data-s="buy">
+<h2>Portfolioanalyse</h2>
+<div class="sub" id="byStand"></div>
+<div class="acts2"><button class="btn" type="button" id="byGo">Analyse aktualisieren</button></div>
+<div class="sub" id="byMsg" style="margin-top:6px" role="status"></div>
+<div class="kp" id="byKp" style="margin-top:12px"></div>
+<div class="cl" style="margin-top:14px">Abweichung vom passenden Gewicht, größte Lücken und Überhänge</div>
+<div id="byGap"></div>
+<div class="lg" style="margin-top:6px"><span><i style="background:#FF9F0A"></i>zu viel Gewicht</span><span><i style="background:#007AFF"></i>zu wenig Gewicht</span></div>
+<div id="byNews" hidden><div class="cl" style="margin-top:14px">Aus der letzten Recherche</div><div id="byNewsL"></div></div>
+</section>
+<section data-v="plan" data-s="buy">
+<h2>Nachkaufplan</h2>
+<div class="mkf" style="grid-template-columns:1fr"><label><span>Betrag, den du nachkaufen willst (€)</span><input id="byBud" type="number" inputmode="decimal" min="25" step="any"></label></div>
+<div id="byRows" style="margin-top:6px"></div>
+<div id="bySum"></div>
+<div class="acts2"><button class="btn" type="button" id="bySim">Im Was-wäre-wenn prüfen</button></div>
+<div id="byDiff" style="margin-top:10px"></div>
+<div class="cl" style="margin-top:14px">Nicht im Plan, obwohl Kern oder guter Score</div>
+<div id="byOut"></div>
+<p class="note">Regeln: Infrage kommen Coins der Klassen Robust und Mittelklasse mit Score ab 45, auch Katalog-Coins ohne Bestand. Ausgeschlossen wird, wer einen Risiko-Abzug ab 10 Punkten hat, in 30 Tagen über 60 % gestiegen ist oder mehr als doppelt so hoch wie sein 200-Tage-Schnitt steht. Geld bekommt nur, wer unter seinem passenden Gewicht liegt (Gewicht im Verhältnis zum Quadrat des Scores). Kernnarrativ zählt 1,25-fach, nach mehr als 30 % Anstieg in 30 Tagen halbiert sich der Anteil. Höchstens 6 Käufe, mindestens 25 € je Kauf, nie über die Lücke zum passenden Gewicht hinaus. Der Plan ändert sich nur über „Analyse aktualisieren“ oder einen neuen Betrag. Rechenmodell der App, keine Finanzberatung.</p>
+</section>
 <section id="sim" data-v="plan" data-s="sim">
 <h2>Was-wäre-wenn</h2>
 <p class="sub" style="margin:0 0 6px">Umschichtung durchspielen. Am Depot ändert sich erst etwas, wenn du die Mengen übernimmst.</p>
@@ -472,13 +496,6 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <p class="note">RWA-Daten: fester Stand vom 25.11.2026 (RWA.xyz Distributed, DefiLlama). Sie werden nicht mitsynchronisiert; die Depotwerte daneben schon.</p>
 </section>
 
-<section id="plan" data-v="plan" data-s="ziel">
-<h2>Aufstockplan</h2>
-<div id="planr"></div>
-<div class="h"><span>Summe Zukauf</span><span id="plans"></span></div>
-<div class="lg" style="margin-top:6px"><span><i style="background:#639922"></i>Bestand</span><span><i style="background:#97C459"></i>Zukauf</span><span>Nicht aufstocken: STABLE, ALGO, AVAX, NEAR</span></div>
-<p class="note">Beträge sind änderbar und bleiben auf diesem Gerät. Vorschlag aus dem Chat, keine Finanzberatung.</p>
-</section>
 
 <section id="termine" data-v="plan" data-s="mark">
 <h2>Termine und offene Punkte</h2>
@@ -500,7 +517,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <h2>Daten</h2>
 <div class="sub" id="ver" style="font-weight:600"></div>
 <div class="sub" id="bkInfo" style="margin:2px 0 8px"></div>
-<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: Kursabfragen an CoinGecko mit den Coin-Namen (auch für Coins mit Kursmarke oder Kauf im Was-wäre-wenn) und allgemeine Marktdaten von CoinGecko, DefiLlama und alternative.me. Mengen werden nie übertragen.</p>
+<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: Kursabfragen an CoinGecko mit den Coin-Namen (für alle Coins im Katalog der App, auch ohne Bestand) und allgemeine Marktdaten von CoinGecko, DefiLlama und alternative.me. Mengen werden nie übertragen.</p>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
 <label class="btn" style="display:inline-flex;align-items:center;cursor:pointer;position:relative;overflow:hidden">Datei importieren<input id="imp" type="file" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:pointer"></label>
 <button class="btn" id="expBtn" type="button">Backup erstellen</button>
@@ -537,7 +554,7 @@ const M0={XLM:[4556,6418,122],PYTH:[382.9,486.2,21.8],NEAR:[3851,3851,449],SOL:[
 const INST={XLM:[80,"RWA-Netzwerk Nr. 4 (4,86 Mrd. $, +29 %), Stablecoin-Volumen +50 %"],ONDO:[90,"RWA-Plattform Nr. 1 in Distributed (4,07 Mrd. $)"],SOL:[90,"RWA-Netzwerk Nr. 3, höchstes Stablecoin-Volumen (405,7 Mrd. $ in 30 T)"],MORPHO:[75,"meiste RWA-Sicherheiten im DeFi-Lending (843 Mio. $)"],XRP:[70,"RWA-Netzwerk Nr. 5, Zahlungsvolumen steigend"],LINK:[70,"Datenlieferant für Aave Horizon, selbst nicht messbar"],AAVE:[70,"RWA-Lending über V3 und Horizon"],POL:[65,"21 Mio. Stablecoin-Holder, SoFiUSD live"],ENA:[60,"drittgrößter Stablecoin (USDe, 4,94 Mrd. $)"],SYRUP:[55,"RWA-Plattform Nr. 12, rückläufig"],PYTH:[50,"11,49 Mio. $ wiederkehrender Umsatz (+86,5 % zum Vorquartal), Datenlieferant für LayerZero"],AVAX:[45,"RWA Nr. 6, nur 10 % distributed"],ZRO:[45,"Kakao Pay, Samsung Card und ZAN als Validatoren (25.11.), keine Nutzungszahlen"],QNT:[35,"von The Clearing House ausgewählt (09/2026), Zugang erst H1 2027"],W:[35,"Sunrise API für 90 tokenisierte US-Aktien und ETFs (16.11.)"],PLUME:[30,"RWA Nr. 16, rückläufig"],COMP:[30,"institutioneller USDG-Markt angekündigt, unbestätigt"],CRO:[30,"58.594 Transaktionen pro Tag im November, Rückkäufe laufen"],PEAQ:[30,"2,5 Mio. Maschinen aktiviert (11.11.)"],CLEAR:[30,"273 Mio. $ vergebene Kredite, Stand 11/2025"],AKT:[25,"GPU Forward Market angekündigt, Pilot Q1 2027"],ICP:[25,"staatlich gestütztes ChatT (Pakistan) startet Beta auf ICP"],ADA:[25,"59,4 Mio. $ Stablecoins (−14 %), Brale live"],S:[25,"USDC-Bridge von Circle, Nutzungszahlen veraltet"],POLYX:[25,"TruGolf-Cap-Table ab Q1 2027, keine Nutzungszahlen"],PAAL:[25,"11,4 Mio. Mitglieder in 21.000 Gruppen (09/2026)"],TAO:[20,"nur eine Subnet-Zahl (109.440 $ Gebühren im Oktober)"],NEAR:[20,"13 Mio. $ RWA, Mitglied in NVIDIAs AI-Allianz ohne genannte Rolle"],THETA:[20,"Weaver Labs nutzt EdgeCloud, keine Zahlen"],TFUEL:[20,"wird für EdgeCloud genutzt, keine Zahlen"],IOTA:[20,"LayerZero und BitGo angebunden, keine Nutzungszahlen"],XDP:[20,"FXRP-Vault mit Flare, keine Zahlen"],DSYNC:[20,"20.000 Nodes, Stand 10/2025"],ALEPH:[20,"Revolut-Listing und Ubisoft, Stand 2025"],ALGO:[15,"1 RWA-Asset, keine Stablecoin-Daten"],STABLE:[15,"33 Mio. $ Stablecoins auf der Chain"],FIL:[15,"nur Produktstarts für Endnutzer"],COTI:[15,"Uphold-Listing, Nutzung unbelegt"],PORTAL:[15,"Animoca stützt neues Team, keine Zahlen"],DAG:[15,"Partnerschaften ohne Datum, keine Zahlen"],TRADE:[15,"RWA-Marktplatz, Stand 2025"],VET:[10,"nichts Belegtes gefunden"],FET:[10,"nichts Belegtes gefunden"],TIA:[10,"nur Labor-Benchmark, keine Nutzung"],GRT:[10,"nichts Belegtes gefunden"],DASH:[10,"nichts Belegtes gefunden"],POWR:[10,"nichts Belegtes gefunden"],SUPRA:[10,"nichts Belegtes gefunden"],XAI:[10,"nichts Belegtes gefunden"],IRYS:[10,"nichts Belegtes gefunden"],ATLAS:[10,"Spielwirtschaft −71 %, Stand 2025"],AKE:[10,"nichts Belegtes gefunden"],ALU:[0,"kein laufender Betrieb belegt"]};
 const FLAG={ALU:[40,"Insider-Mint von 150 Mio. ALU (07/2025), Projekt übernommen"],IRYS:[20,"Unlock am 25.11. in Höhe von 59 % der Market Cap"],AKE:[20,"−41,9 % an einem Tag (20.11.), Unlock von 9,3 % des Umlaufs"],PORTAL:[15,"Delisting bei Phemex, Relaunch läuft"],CRO:[10,"Exploit mit Chain-Rollback am 30.08.2026"],POL:[10,"Diebstahl von 70,49 Mio. POL, Fork geplant"],STABLE:[10,"Unlock am 08.12.2026"],DASH:[10,"EU-Verbot von Privacy-Coins ab 10.07.2027"],ALEPH:[10,"45 % mehr Umlauf seit August"],POWR:[10,"Binance entfernte alle Margin-Paare (14.08.2026)"],ONDO:[5,"Unlock am 18.01.2027"],VET:[5,"Delisting bei CoinW (12.11.)"],COTI:[5,"DJED und SHEN werden zum 31.12. eingestellt"],THETA:[5,"Theta Labs will 30 Mio. THETA entstaken"],IOTA:[5,"Oracle-Vorfall bei Virtue (455.000 $), BloFin-Delisting"]};
 let RSD="2026-11-25";const FEXP={POWR:"2027-02-10",CRO:"2027-02-26",VET:"2027-05-11",AKE:"2027-05-19",IRYS:"2027-05-24",STABLE:"2027-06-06",COTI:"2027-06-29",ONDO:"2027-07-17"};
-try{const rs=JSON.parse(localStorage.getItem("depot-app-v1")||"{}").rs;if(rs&&typeof rs==="object"){if(/^\d{4}-\d\d-\d\d$/.test(rs.asof||""))RSD=rs.asof;const mg=(dst,src,exp)=>{if(src&&typeof src==="object")Object.keys(src).forEach(k=>{const v=src[k],t=String(k).toUpperCase();if(v===null){delete dst[t];if(exp)delete FEXP[t]}else if(Array.isArray(v)&&isFinite(+v[0])){dst[t]=[Math.max(0,Math.min(100,+v[0])),String(v[1]||"").slice(0,200)];if(exp){if(/^\d{4}-\d\d-\d\d$/.test(v[2]||""))FEXP[t]=v[2];else delete FEXP[t]}}})};mg(INST,rs.inst,false);mg(FLAG,rs.flag,true)}}catch(e){}
+try{const rs=JSON.parse(localStorage.getItem("depot-app-v1")||"{}").rs;if(rs&&typeof rs==="object"){if(/^\d{4}-\d\d-\d\d$/.test(rs.asof||""))RSD=rs.asof;const mg=(dst,src,exp)=>{if(src&&typeof src==="object")Object.keys(src).forEach(k=>{const v=src[k],t=String(k).toUpperCase();if(v===null){delete dst[t];if(exp)delete FEXP[t]}else if(Array.isArray(v)&&isFinite(+v[0])){dst[t]=[Math.max(0,Math.min(100,+v[0])),String(v[1]||"").slice(0,200)];if(exp){if(/^\d{4}-\d\d-\d\d$/.test(v[2]||""))FEXP[t]=v[2];else delete FEXP[t]}}})};mg(INST,rs.inst,false);mg(FLAG,rs.flag,true);if(Array.isArray(rs.coins))rs.coins.forEach(c=>{if(!Array.isArray(c))return;const g=String(c[0]),t=String(c[1]||"").toUpperCase(),id=String(c[2]||"");if(/^[ABCD]$/.test(g)&&/^[A-Z0-9]{1,10}$/.test(t)&&/^[a-z0-9-]+$/.test(id)&&!RAW.some(r=>r[1]===t))RAW.push([g,t,0,0,0,id])});if(Array.isArray(rs.core))rs.core.forEach(t=>K.add(String(t).toUpperCase()))}}catch(e){}
 const flagOf=t=>{const f=FLAG[t];if(!f)return null;const x=FEXP[t];if(x&&Date.now()>new Date(x+"T23:59:59").getTime())return null;return x?[f[0],f[1]+" (Abzug läuft am "+new Date(x+"T12:00:00").toLocaleDateString("de-DE")+" aus)"]:f};
 const ALL=RAW.map(r=>({g:r[0],t:r[1],q:0,u0:r[3],c0:r[4],id:r[5]}));
 const LS="depot-app-v1";
@@ -685,7 +702,7 @@ function render(){
  $("sig").innerHTML=sv.map(x=>`<div style="width:${x[2]}%;background:${x[1]}"></div>`).join("");
  $("sigl").innerHTML=sv.map(x=>`<span><i style="background:${x[1]}"></i>${x[0]} ${pc(x[2])}</span>`).join("");
  $("rwat").innerHTML=R.filter(r=>has(r[0])).map(r=>`<div class="qq"><span><b style="font-weight:500">${r[0]}</b></span><span class="v">${eur(by(r[0]).v)}</span><span class="mm">${r[1]}</span><span class="pl s${r[2]}">${L[r[2]]}</span></div>`).join("");
- renderPlan();renderCheck(T);
+ renderCheck(T);
  const now=Date.now();
  $("evs").innerHTML=EV.filter(e=>has(e[0])).map(e=>{let dt="laufend",sub="";if(e[1]){const t=new Date(e[1]+"T00:00:00");const n=Math.ceil((t-now)/864e5);dt=t.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"});sub=n>=0?"in "+n+" Tagen":"vorbei"}return`<div class="ev"><span><b style="font-weight:500">${e[0]}</b></span><span class="d">${dt}<small>${sub}</small></span><span>${e[2]}<small>Position: ${eur(by(e[0]).v,0)}</small></span></div>`}).join("");
  drawChart();drawViz();
@@ -715,11 +732,6 @@ function renderCheck(T){const srt=D.slice().sort((a,b)=>b.v-a.v),sum=f=>D.filter
  const CC=["","#8E8E93","#FF9F0A","#FF3B30"],CL=["","Hinweis","mittel","kritisch"];
  $("ckBad").innerHTML=bad.length?bad.map(x=>`<div class="sig"><i style="background:${CC[x[0]]}"></i><b>${x[1]}</b><span class="sv">${x[2]}<em>${CL[x[0]]}</em></span><small>${x[3]}</small></div>`).join(""):'<div class="sub">Keine Schwächen nach diesen Regeln.</div>';
  $("ckGood").innerHTML=good.length?good.map(x=>`<div class="sig"><i style="background:#34C759"></i><b>${x[0]}</b><span class="sv">${x[1]}</span><small>${x[2]}</small></div>`).join(""):'<div class="sub">Keine Stärken nach diesen Regeln.</div>'}
-function renderPlan(){const P=Object.keys(S.plan);const pv=t=>{const d=by(t);return d?d.v:0};const pm=Math.max(...P.map(t=>pv(t)+(+S.plan[t]||0)));
- if(!$("planr").children.length)$("planr").innerHTML=P.map(t=>`<div class="a"><span><b style="font-weight:500">${t}</b>${by(t)?"":" <small style=\"color:var(--mut)\">neu</small>"}</span><label><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Zukauf ${t} in Euro</span><input id="pl-${t}" type="number" inputmode="numeric" min="0" step="50" value="${+S.plan[t]||0}"></label><div class="ab" id="pb-${t}"></div><span class="v" id="pv-${t}"></span></div>`).join("");
- let sum=0;P.forEach(t=>{const a=+S.plan[t]||0,v=pv(t);sum+=a;$("pb-"+t).innerHTML=`<div style="width:${v/pm*100}%;background:#639922;border-radius:2px 0 0 2px"></div><div style="width:${a/pm*100}%;background:#97C459;border-radius:0 2px 2px 0"></div>`;$("pv-"+t).textContent="→ "+eur(v+a,0)});
- $("plans").textContent=eur(sum)+(sum>1000?" · über Budget 1.000 €":sum<1000?" · "+eur(1000-sum,0)+" frei":" · Budget 1.000 €")}
-$("planr").addEventListener("input",e=>{const m=e.target.id&&e.target.id.match(/^pl-(.+)$/);if(!m)return;S.plan[m[1]]=Math.max(0,+e.target.value||0);S.plan3=S.plan;save();renderPlan()});
 $("flt").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(b){UI.f=b.dataset.f;render()}});
 $("srt").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){if(UI.q)UI.qs=b.dataset.s;else UI.s=b.dataset.s;render()}});
 $("vw").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){UI.q=b.dataset.q==="1";UI.open=null;render()}});
@@ -891,7 +903,7 @@ $("sync").addEventListener("click",sync);
 function applyImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return"Kein gültiges JSON."}
  if(!o||typeof o!=="object")return"Kein gültiges JSON.";
  if(o.app==="depot-backup"&&o.state&&typeof o.state==="object"){S=o.state;save();if(o.rec&&typeof o.rec==="object"){["asi","cap","dom","mine"].forEach(k=>{if(Array.isArray(o.rec[k]))MK[k]=o.rec[k].filter(x=>x&&isFinite(+x.t)).slice(-900)});saveM()}return""}
- if(o.research&&typeof o.research==="object"){S.rs={asof:String(o.research.asof||""),inst:o.research.inst||{},flag:o.research.flag||{}};save();return""}
+ if(o.research&&typeof o.research==="object"){S.rs={asof:String(o.research.asof||""),inst:o.research.inst||{},flag:o.research.flag||{},coins:Array.isArray(o.research.coins)?o.research.coins.slice(0,60):[],core:Array.isArray(o.research.core)?o.research.core.slice(0,80):[],notes:Array.isArray(o.research.notes)?o.research.notes.slice(0,20):[]};save();return""}
  const h=o.holdings&&typeof o.holdings==="object"?o.holdings:o;const known=new Set(ALL.map(d=>d.t));let n=0;const skip=[];
  Object.keys(h).forEach(k=>{const t=String(k).toUpperCase(),v=Number(h[k]);if(!isFinite(v)||v<0)return;if(known.has(t)){S.q[t]=v;n++}else skip.push(t)});
  if(!n)return"Keine bekannten Coins gefunden.";save();return skip.length?"ok:"+skip.join(", "):""}
@@ -904,6 +916,7 @@ let wipe=0;$("wipeBtn").addEventListener("click",()=>{if(Date.now()-wipe<4000){t
 /* ===== v8: Grafiken, Narrative, Planen ===== */
 const NAR=[["rwa","RWA & Tokenisierung","ONDO PLUME POLYX CLEAR SYRUP TRADE XDP",["real-world-assets-rwa"],"RWA"],["lend","DeFi-Lending","AAVE MORPHO COMP",["lending-borrowing"],"Lending"],["pay","Zahlungen & Stablecoins","XRP XLM ENA STABLE DASH",["stablecoins"],"Zahlungen"],["l1","Layer 1","SOL AVAX NEAR ADA ICP ALGO S TIA IOTA VET SUPRA DAG COTI CRO POL",["layer-1"],"Layer 1"],["infra","Daten & Brücken","LINK PYTH QNT ZRO W GRT",["oracle","cross-chain-communication"],"Daten"],["ai","KI & DePIN","TAO FET AKT FIL THETA TFUEL PEAQ POWR PAAL DSYNC ALEPH IRYS",["artificial-intelligence","depin"],"KI/DePIN"],["game","Gaming & Sonstige","PORTAL XAI ATLAS ALU AKE",["gaming"],"Gaming"]];
 const NOF={};NAR.forEach(n=>n[2].split(" ").forEach(t=>NOF[t]=n[0]));
+try{((S.rs||{}).coins||[]).forEach(c=>{if(Array.isArray(c)&&NAR.some(n=>n[0]===c[3]))NOF[String(c[1]).toUpperCase()]=c[3]})}catch(e){}
 const CATIDS=new Set(NAR.flatMap(n=>n[3]));
 const VZ={tm:"c",cp:"90",hmS:"sh",hmAll:false,nr:"30",nrOpen:null,sw:null};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -918,8 +931,8 @@ const chipsH=(arr,cur,attr)=>arr.map(m=>`<button type="button" class="chip" data
 const vis=id=>{const e=$(id);return e&&e.clientWidth>0};
 
 /* ---------- Unterreiter ---------- */
-const SUBS={mkt:[["rad","Lage"],["kur","Kurse"],["geld","Markt & Geld"]],ana:[["chk","Check"],["ret","Rendite"],["nar","Narrative"],["info","RWA"]],plan:[["sim","Simulation"],["ziel","Ziele"],["mark","Marken & Termine"]]};
-let SUB={mkt:"rad",ana:"chk",plan:"sim"};try{const s=JSON.parse(sessionStorage.getItem("depot-sub")||"{}");["mkt","ana","plan"].forEach(v=>{if(s&&SUBS[v].some(x=>x[0]===s[v]))SUB[v]=s[v]})}catch(e){}
+const SUBS={mkt:[["rad","Lage"],["kur","Kurse"],["geld","Markt & Geld"]],ana:[["chk","Check"],["ret","Rendite"],["nar","Narrative"],["info","RWA"]],plan:[["buy","Nachkauf"],["sim","Simulation"],["ziel","Ziele"],["mark","Marken"]]};
+let SUB={mkt:"rad",ana:"chk",plan:"buy"};try{const s=JSON.parse(sessionStorage.getItem("depot-sub")||"{}");["mkt","ana","plan"].forEach(v=>{if(s&&SUBS[v].some(x=>x[0]===s[v]))SUB[v]=s[v]})}catch(e){}
 function applySub(){["mkt","ana","plan"].forEach(v=>{$(v+"Sub").innerHTML=chipsH(SUBS[v],SUB[v],"sub");document.querySelectorAll(`[data-v="${v}"][data-s]`).forEach(el=>el.classList.toggle("soff",el.dataset.s!==SUB[v]))})}
 ["mkt","ana","plan"].forEach(v=>$(v+"Sub").addEventListener("click",e=>{const b=e.target.closest("[data-sub]");if(!b)return;SUB[v]=b.dataset.sub;try{sessionStorage.setItem("depot-sub",JSON.stringify(SUB))}catch(e){}applySub();window.scrollTo(0,0);if(v==="mkt")renderMarket();drawViz()}));
 
@@ -1053,7 +1066,7 @@ function metrics(list){const rows=list.filter(x=>x.q>0).map(x=>({d:x.d,v:x.q*pri
  return{T,n:rows.length,avg:rows.reduce((a,r)=>a+r.v*r.sc,0)/T,hi:sum(r=>r.sc>=60),lo:sum(r=>r.sc<30),rk:sum(r=>r.d.g==="C"||r.d.g==="D"),core:sum(r=>K.has(r.d.t)),top5:srt.slice(0,5).reduce((a,r)=>a+r.v,0)/T*100,g:{A:sum(r=>r.d.g==="A"),B:sum(r=>r.d.g==="B"),C:sum(r=>r.d.g==="C"),D:sum(r=>r.d.g==="D")}}}
 const byA=t=>ALL.find(d=>d.t===t);
 const optAll=(sel,held)=>(held?D.slice().sort((a,b)=>b.v-a.v):ALL.slice().sort((a,b)=>a.t.localeCompare(b.t))).map(d=>`<option value="${d.t}"${d.t===sel?" selected":""}>${d.t}</option>`).join("");
-function syn(){const ex=new Set();(S.sim||[]).forEach(l=>{if(l.s==="b")ex.add(l.t)});Object.keys(S.mark||{}).forEach(t=>ex.add(t));return D.concat(ALL.filter(d=>!(d.q>0)&&ex.has(d.t)))}
+function syn(){return D.concat(ALL.filter(d=>!(d.q>0)&&/^[a-z0-9-]+$/.test(d.id||"")))}
 
 /* ---------- Was-wäre-wenn ---------- */
 S.sim=Array.isArray(S.sim)?S.sim:[];let simArm=0;
@@ -1119,10 +1132,10 @@ function drawViz(){if(!D.length)return;if(D[0].sc===undefined)calc();const v=doc
  if(v==="home"){drawMst();drawTM()}
  if(v==="mkt")mktViz();
  if(v==="ana"){const s=SUB.ana;if(s==="chk"){drawCk();drawSW()}if(s==="ret"){drawCmp();drawCtb();drawDrift();drawRisk();drawHM()}if(s==="nar"){drawNar();drawMy()}}
- if(v==="plan"){const s=SUB.plan;if(s==="sim"){drawSim();drawSz()}if(s==="ziel")drawTg()}}
+ if(v==="plan"){const s=SUB.plan;if(s==="buy")drawBuy();if(s==="sim"){drawSim();drawSz()}if(s==="ziel")drawTg()}}
 let rzT=0;window.addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout(drawViz,150)});
 /* ===== v9: Marktleiste, weitere Charts, Version, Backup ===== */
-const VER="9",VERD="27.11.2026";
+const VER="10",VERD="27.11.2026";
 VZ.fg="90";VZ.ct="30";
 const FGL=v=>v<25?"Extreme Angst":v<45?"Angst":v<=55?"Neutral":v<=75?"Gier":"Extreme Gier";
 const FGS=[[0,25,"#FF3B30"],[25,45,"#FF9F0A"],[45,55,"#8E8E93"],[55,75,"#9BD45B"],[75,100,"#34C759"]],ASS=[[0,25,"#FF9F0A"],[25,42,"#F5C77E"],[42,58,"#8E8E93"],[58,75,"#9BD45B"],[75,100,"#34C759"]];
@@ -1180,6 +1193,36 @@ function drawMeta(){const now=Date.now(),bk=+S.bkAt||0,bd=bk?Math.floor((now-bk)
  const rd=Math.floor((now-new Date(RSD+"T12:00:00").getTime())/864e5),e=$("rsAge");if(e){e.textContent="Recherche-Stand der Bewertungen: "+new Date(RSD+"T12:00:00").toLocaleDateString("de-DE")+" (vor "+rd+(rd===1?" Tag":" Tagen")+")."+(rd>45?" Traktion und Risiko-Abzüge sind damit veraltet und sollten neu recherchiert werden.":"");e.style.color=rd>45?"var(--dn)":""}}
 $("gear").addEventListener("click",()=>setView("data"));
 $("upd").addEventListener("click",()=>location.reload());
+/* ===== v10: Portfolioanalyse und Nachkaufplan ===== */
+S.bud=isFinite(+S.bud)&&+S.bud>0?+S.bud:500;
+function buyCalc(bud){if(D[0].sc===undefined)calc();const T=D.reduce((a,d)=>a+d.v,0),rows=ALL.map(d=>{const sc=score(d).tot,held=d.q>0,v=held?d.v:0;return{d,t:d.t,sc,v,sh:v/T*100,held,ab:d.g==="A"||d.g==="B",p:price(d)}});
+ const pool=rows.filter(r=>r.held||(r.sc>=45&&r.ab&&r.p>0)),st2=pool.reduce((a,r)=>a+r.sc*r.sc,0)||1;
+ rows.forEach(r=>{r.fair=r.sc*r.sc/st2*100;r.gap=r.fair-r.sh;r.r30=retN(r.d,30);const h=PH[r.t];r.ext=null;if(h&&h.p&&h.p.length>=120&&r.p>0){const a=h.p.slice(-200);r.ext=(r.p/avgA(a)-1)*100}const f=flagOf(r.t);
+  r.why=!r.ab?"Klasse "+GN[r.d.g]:r.sc<45?"Score "+Math.round(r.sc)+", nötig sind 45":!(r.p>0)?"noch kein Kurs, erst Analyse aktualisieren":f&&f[0]>=10?"Risiko-Abzug: "+f[1]:r.r30!==null&&r.r30>60?"stark gelaufen: "+sg(r.r30,0)+" % in 30 Tagen":r.ext!==null&&r.ext>100?"stark gelaufen: "+sg(r.ext,0)+" % über dem 200-Tage-Schnitt":r.gap<=.15?"Gewicht reicht: "+pc(r.sh)+" bei passenden "+pc(r.fair):"";
+  r.w=r.why?0:r.gap*(K.has(r.t)?1.25:1)*(r.r30!==null&&r.r30>30?.5:1)});
+ let cand=rows.filter(r=>r.w>0).sort((a,b)=>b.w-a.w).slice(0,6);const T2=T+bud;cand.forEach(r=>{r.cap=Math.max(0,r.gap/100*T2);r.a=0});let left=bud,act=cand.slice();
+ for(let it=0;it<8&&left>1&&act.length;it++){const ws=act.reduce((a,r)=>a+r.w,0);let used=0;act.forEach(r=>{const x=Math.max(0,Math.min(r.cap-r.a,left*r.w/ws));r.a+=x;used+=x});left-=used;act=act.filter(r=>r.cap-r.a>1);if(used<.5)break}
+ cand.forEach(r=>r.a=Math.floor(r.a/5)*5);cand=cand.filter(r=>r.a>=25);const sum=cand.reduce((a,r)=>a+r.a,0);
+ return{T,rows,cand,rest:Math.max(0,bud-sum)}}
+function buySnap(keepPrev){const bud=S.bud,c=buyCalc(bud);if(!keepPrev&&S.bp&&S.bp.rows)S.bp0=S.bp;S.bp={at:Date.now(),bud,rows:c.cand.map(r=>({t:r.t,a:r.a})),rest:c.rest};save()}
+function drawBuy(){if(!S.bp||!S.bp.rows||S.bp.bud!==S.bud)buySnap(true);const c=buyCalc(S.bud),bp=S.bp,by2=t=>c.rows.find(r=>r.t===t),dt=t=>new Date(t).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),m=v=>S.hide?"••••":eur(v,0);
+ const rd=Math.floor((Date.now()-new Date(RSD+"T12:00:00").getTime())/864e5),hn=D.filter(d=>PH[d.t]&&PH[d.t].p&&PH[d.t].p.length>30).length;
+ $("byStand").innerHTML=`Plan vom <b>${dt(bp.at)}</b> · Kurse ${S.at?dt(S.at):"noch nie geladen"} · Recherche vor ${rd} ${rd===1?"Tag":"Tagen"} · Kurshistorie für ${hn} von ${D.length} Coins`+(rd>45?' <b style="color:var(--dn)">· Recherche veraltet</b>':"");
+ const held=c.rows.filter(r=>r.held),under=held.filter(r=>r.gap>.15&&r.ab&&r.sc>=45),over=held.filter(r=>r.gap<-.5),avg=held.reduce((a,r)=>a+r.sh*r.sc,0)/100;
+ $("byKp").innerHTML=[["Ø Score",Math.round(avg),"von 100, gewichtet"],["Unter passendem Gewicht",under.length,"mit Score ab 45, Klasse Robust oder Mittel"],["Über passendem Gewicht",over.length,"um mehr als 0,5 Punkte"],["Im Plan",bp.rows.length,"von höchstens 6 Käufen"]].map(k=>`<div class="k"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="x">${k[2]}</div></div>`).join("");
+ const mxA=Math.max(...bp.rows.map(r=>r.a),1);
+ $("byRows").innerHTML=bp.rows.length?bp.rows.map(x=>{const r=by2(x.t);if(!r)return"";const after=(r.v+x.a)/(c.T+bp.bud)*100,sc=Math.max(r.fair,after,r.sh)*1.12||1;return`<div class="byr"><div class="tgh"><span><b>${r.t}</b>${r.held?"":'<em class="kb" style="background:#FF9F0A">neu</em>'}${K.has(r.t)?'<em class="kb">Kern</em>':""}</span><span><b>${m(x.a)}</b>${r.p>0&&!S.hide?' <small class="sub">≈ '+(x.a/r.p).toLocaleString("de-DE",{maximumFractionDigits:x.a/r.p<10?3:0})+" Stück</small>":""}</span></div><div class="bw" style="height:10px;border-radius:4px;margin:6px 0 8px"><div class="f" style="width:${(x.a/mxA*100).toFixed(1)}%;height:10px;border-radius:4px;background:var(--acc)"></div></div><div class="tgb" style="display:flex;overflow:visible"><div class="f" style="width:${(r.sh/sc*100).toFixed(1)}%;background:${C[r.d.g]};border-radius:4px 0 0 4px"></div><div class="f" style="width:${(Math.max(0,after-r.sh)/sc*100).toFixed(1)}%;background:var(--acc);opacity:.55;border-radius:0 4px 4px 0"></div><u style="left:${(r.fair/sc*100).toFixed(1)}%"></u></div><div class="sub" style="font-size:12px">Gewicht ${pc(r.sh)} → <b>${pc(after)}</b> · passend ${pc(r.fair)} · Score ${Math.round(r.sc)}${r.r30!==null?" · 30 T "+sg(r.r30,0)+" %":""}</div></div>`}).join(""):'<div class="sub" style="padding:10px 0">Aktuell erfüllt kein Coin die Regeln. Das Budget bleibt unverteilt.</div>';
+ $("bySum").innerHTML=`<div class="cr"><span>Verteilt</span><span>${m(bp.bud-bp.rest)}</span></div>`+(bp.rest>=1?`<div class="cr"><span>Nicht verteilt</span><span>${m(bp.rest)}<small>Obergrenze je Coin ist die Lücke zum passenden Gewicht</small></span></div>`:"");
+ {const p0=S.bp0,e=$("byDiff");if(p0&&p0.rows&&p0.at!==bp.at){const a=new Set(p0.rows.map(x=>x.t)),b=new Set(bp.rows.map(x=>x.t)),neu=[...b].filter(t=>!a.has(t)),weg=[...a].filter(t=>!b.has(t));e.innerHTML=`<div class="cl">Gegenüber dem Plan vom ${dt(p0.at)}</div>`+(neu.length||weg.length?neu.map(t=>`<div class="sig"><i style="background:#34C759"></i><b>${t}</b><span class="sv">neu im Plan</span></div>`).join("")+weg.map(t=>{const r=by2(t);return`<div class="sig"><i style="background:#FF9F0A"></i><b>${t}</b><span class="sv">entfällt</span><small>${esc(r&&r.why?r.why:"andere Coins haben jetzt Vorrang")}</small></div>`}).join(""):'<div class="sub">Dieselben Coins, nur die Beträge haben sich verschoben.</div>')}else e.innerHTML=""}
+ const dv=held.filter(r=>Math.abs(r.gap)>.3).sort((a,b)=>b.gap-a.gap),top=dv.slice(0,5).concat(dv.slice(-5).filter(r=>r.gap<0&&!dv.slice(0,5).includes(r))),mxG=Math.max(...top.map(r=>Math.abs(r.gap)),1);
+ $("byGap").innerHTML=top.map(r=>dbar(`<b>${r.t}</b>`,r.gap,mxG,sg(r.gap)+" Pkt.<small>"+pc(r.sh)+" statt "+pc(r.fair)+"</small>","#007AFF","#FF9F0A")).join("");
+ const out=c.rows.filter(r=>r.why&&r.ab&&(r.sc>=45||K.has(r.t))&&!bp.rows.some(x=>x.t===r.t)).sort((a,b)=>b.sc-a.sc).slice(0,10);
+ $("byOut").innerHTML=out.map(r=>`<div class="sig"><i style="background:#8E8E93"></i><b>${r.t}</b><span class="sv">Score ${Math.round(r.sc)}</span><small>${esc(r.why)}</small></div>`).join("")||'<div class="sub">Keine.</div>';
+ const nt=(S.rs&&Array.isArray(S.rs.notes)?S.rs.notes:[]).slice(0,10);$("byNews").hidden=!nt.length;$("byNewsL").innerHTML=nt.map(n=>`<div class="sig"><i style="background:#007AFF"></i><b>${esc(String(n[0]||"").slice(0,10))}</b><span class="sv">${esc(String(n[1]||"").slice(0,10))}</span><small>${esc(String(n[2]||"").slice(0,240))}</small></div>`).join("");
+ const b=$("byBud");if(document.activeElement!==b)b.value=S.bud}
+$("byBud").addEventListener("change",e=>{const v=Math.max(25,Math.min(1e6,+e.target.value||0));S.bud=v;save();buySnap(true);drawBuy()});
+$("byGo").addEventListener("click",async()=>{const b=$("byGo"),a0=S.at;b.disabled=true;b.textContent="Analyse läuft …";try{await sync()}catch(e){}buySnap(false);drawBuy();b.disabled=false;b.textContent="Analyse aktualisieren";$("byMsg").textContent=S.at&&S.at!==a0?"Kurse geladen, Plan neu berechnet.":"Kurse konnten nicht geladen werden, Plan mit den letzten Kursen berechnet."});
+$("bySim").addEventListener("click",()=>{if(!S.bp||!S.bp.rows.length)return;S.sim=S.bp.rows.map(x=>({s:"b",t:x.t,a:x.a}));save();SUB.plan="sim";applySub();window.scrollTo(0,0);drawViz()});
 applySub();
 render();bgRender();
 {let v="home";try{v=sessionStorage.getItem("depot-view")||"home"}catch(e){}setView(D.length?v:"home")}
