@@ -235,6 +235,9 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 .old{opacity:.55}#tbP li{margin:4px 0}
 .anh,.anr{display:grid;grid-template-columns:22px 86px minmax(0,1fr) 62px 50px 42px;gap:6px;align-items:center}.anh{font-size:11px;color:var(--mut);padding:0 0 4px}.anh span:nth-child(n+4){text-align:right}
 .anr{width:100%;border:0;border-top:.5px solid var(--ln);background:none;color:var(--ink);font:inherit;font-size:14px;min-height:40px;padding:0;text-align:left;font-variant-numeric:tabular-nums}.anr>span:nth-child(n+4){text-align:right}.anr .bw{display:block;height:10px;border-radius:4px}.anr .bw .f{display:block;height:10px;border-radius:4px}.ank{color:var(--mut);font-size:12px}.anr b{font-weight:600}#anC path[data-t]{cursor:pointer}
+.scb{position:relative;height:14px;border-radius:7px;background:var(--fill);margin:10px 0 8px}.scb i{position:absolute;top:0;height:14px;border-radius:7px;background:var(--acc);opacity:.35}.scb b{position:absolute;top:-4px;width:4px;height:22px;border-radius:2px;background:var(--acc);margin-left:-2px}.scb u{position:absolute;top:-4px;width:2px;height:22px;background:var(--mut);margin-left:-1px}
+.sc3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center}.sc3 small{display:block;font-size:11px;color:var(--mut)}.sc3 b{display:block;font-size:15px;font-variant-numeric:tabular-nums}.sc3 span{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}.sc3 div:first-child{text-align:left}.sc3 div:last-child{text-align:right}
+.epr{padding:8px 0;border-top:.5px solid var(--ln)}
 .upd{display:block;width:100%;border:0;border-radius:12px;margin-top:10px;padding:10px 12px;background:var(--acc);color:#fff;font-size:13px;font-weight:600;text-align:left}.upd[hidden]{display:none}
 .kb{display:inline-block;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:#007AFF;border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:1px}
 </style>
@@ -500,9 +503,13 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <p class="note">Der farbige Balken ist dein Ist-Gewicht, der Strich dein Ziel. Die Ziele legst du selbst fest; vorbelegt sind die gerundeten Ist-Werte.</p>
 </section>
 <section id="sz" data-v="plan" data-s="sim">
-<h2>Szenario</h2>
-<div id="szB"></div>
+<h2>Wenn Bitcoin sich bewegt</h2>
+<div id="szD"></div>
+<div id="szB" style="margin-top:10px"></div>
 <div id="szR"></div>
+<div id="szT"></div>
+<div class="cl" style="margin-top:16px">Was in den letzten zwölf Monaten wirklich passiert ist (30-Tage-Phasen)</div>
+<div id="szE"></div>
 <div class="acts2"><button class="btn" type="button" id="szRst">Zurücksetzen</button></div>
 <p class="note" id="szN"></p>
 </section>
@@ -1176,7 +1183,7 @@ let rzT=0;window.addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout
 const ICOK=/^https:\/\/(coin-images|assets)\.coingecko\.com\/coins\/images\/[\w\/.%-]+(\?\d+)?$/;
 function ico(t,lg){const u=S.img&&S.img[t];return`<span class="ci${lg?" lg":""}" aria-hidden="true">${esc(String(t).slice(0,lg?3:1))}${u&&ICOK.test(u)?`<img src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>`}
 function icoLoad(){try{if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage({ico:1})}catch(e){}Object.values(S.img||{}).forEach((u,i)=>{if(ICOK.test(u))setTimeout(()=>{const im=new Image();im.referrerPolicy="no-referrer";im.src=u},200+i*60)})}
-const VER="17",VERD="27.11.2026";
+const VER="18",VERD="27.11.2026";
 function drawMv(pass){const P=[["1","24 h",8],["7","7 T",20],["30","30 T",40],["90","90 T",60]],cur=P.find(p=>p[0]===UI.mp)||P[0],N=+cur[0];
  $("srt").innerHTML=P.map(f=>`<button type="button" class="chip" data-s="${f[0]}" aria-pressed="${cur[0]===f[0]}">${f[1]}</button>`).join("");$("qnote").hidden=true;
  const rows=D.filter(pass).map(d=>{const r=retN(d,N);return{d,r,e:r!==null&&isFinite(r)&&r>-100?d.v-d.v/(1+r/100):0}}),tot=rows.reduce((a,x)=>a+x.e,0),ok=rows.filter(x=>x.r!==null&&isFinite(x.r)),up=ok.filter(x=>x.r>=0).sort((a,b)=>b.r-a.r),dn=ok.filter(x=>x.r<0).sort((a,b)=>a.r-b.r),no=rows.filter(x=>x.r===null||!isFinite(x.r)),srt=ok.map(x=>x.r).sort((a,b)=>a-b),med=srt.length?(srt[Math.floor((srt.length-1)/2)]+srt[Math.ceil((srt.length-1)/2)])/2:null,bt=btcRet(N);
@@ -1313,6 +1320,38 @@ function drawAnt(){if(!vis("anC"))return;const T=D.reduce((a,d)=>a+d.v,0)||1,gs=
 $("anC").addEventListener("click",e=>{const p=e.target.closest("[data-t]");VZ.an=p&&VZ.an!==p.dataset.t?p.dataset.t:null;drawAnt()});
 $("anL").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)openSheet(b.dataset.t)});
 $("anMore").addEventListener("click",()=>{VZ.anAll=!VZ.anAll;drawAnt()});
+/* ===== v18: Szenario aus den eigenen Kursdaten ===== */
+let SCN=null;VZ.szAll=false;
+function scnFit(){const bh=MK.btcH;if(!bh||bh.length<120)return null;const bm=new Map(bh.map(x=>[x[0],x[1]])),today=dayN(Date.now()),W=14,wins=[],cl2=v=>Math.max(-1,Math.min(4,v));
+ for(let k=today-350+W;k<today;k+=2){const a=bm.get(k-W),b=bm.get(k);if(a>0&&b>0)wins.push([k,Math.log(b/a)])}
+ const up=wins.filter(w=>w[1]>=Math.log(1.05)),dn=wins.filter(w=>w[1]<=Math.log(.95)),out={};
+ D.forEach(d=>{const h=PH[d.t];if(!h||!h.p||h.p.length<100)return;const pr=k=>{const i=k-h.d0;return i>=0&&i<h.p.length?h.p[i]:0},fit=ws=>{const r=[];let sxy=0,sxx=0;ws.forEach(w=>{const a=pr(w[0]-W),b=pr(w[0]);if(a>0&&b>0){const y=Math.log(b/a);r.push(y/w[1]);sxy+=w[1]*y;sxx+=w[1]*w[1]}});if(r.length<8||!(sxx>0))return null;r.sort((a,b)=>a-b);const q=p=>r[Math.round(p*(r.length-1))];return{b:cl2(sxy/sxx),lo:cl2(q(.25)),hi:cl2(q(.75)),n:r.length,win:r.filter(v=>v>1).length/r.length}};out[d.t]={u:fit(up),d:fit(dn)}});
+ const med=(g,k)=>{const a=D.filter(d=>d.g===g&&out[d.t]&&out[d.t][k]).map(d=>out[d.t][k].b).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:null},cm={};["A","B","C","D"].forEach(g=>cm[g]={u:med(g,"u"),d:med(g,"d")});
+ const ep=(sign)=>{const c=[];for(let k=today-335;k<today;k++){const a=bm.get(k-30),b=bm.get(k);if(a>0&&b>0){const r=(b/a-1)*100;if(sign>0?r>=12:r<=-12)c.push([k,r])}}c.sort((x,y)=>sign>0?y[1]-x[1]:x[1]-y[1]);const pick=[];c.forEach(x=>{if(pick.length<3&&!pick.some(p=>Math.abs(p[0]-x[0])<30))pick.push(x)});
+  return pick.map(x=>{let v0=0,v1=0;D.forEach(d=>{const h=PH[d.t];if(!h||!h.p)return;const i0=x[0]-30-h.d0,i1=x[0]-h.d0;if(i0>=0&&i1<h.p.length&&h.p[i0]>0){v0+=d.q*h.p[i0];v1+=d.q*h.p[i1]}});return{k:x[0],btc:x[1],dep:v0>0?(v1/v0-1)*100:null}}).filter(e=>e.dep!==null).sort((a,b)=>a.k-b.k)};
+ return{out,cm,nUp:up.length,nDn:dn.length,W,epU:ep(1),epD:ep(-1)}}
+function scnBeta(d,dir){const o=SCN&&SCN.out[d.t],f=o&&o[dir];if(f)return{b:f.b,lo:f.lo,hi:f.hi,own:true};const m=SCN&&SCN.cm[d.g]&&SCN.cm[d.g][dir],b=m===null||m===undefined?1:m;return{b,lo:b*.7,hi:b*1.3,own:false}}
+function scnCalc(X){const x=Math.log(1+X/100),dir=X>=0?"u":"d",rows=D.map(d=>{const B=scnBeta(d,dir),r=b=>(Math.exp(b*x)-1)*100,a=r(B.lo),c=r(B.hi);return{d,B,mid:r(B.b),lo:Math.min(a,c),hi:Math.max(a,c)}}),T=D.reduce((a,d)=>a+d.v,0),sum=k=>rows.reduce((a,r)=>a+r.d.v*(1+r[k]/100),0);return{rows,T,lo:sum("lo"),mid:sum("mid"),hi:sum("hi")}}
+function szOut(){const X=+(S.sz&&S.sz.btc)||0,c=scnCalc(X),m=v=>S.hide?"••••":eur(v,0),pp=v=>sg((v/c.T-1)*100)+" %";$("szBv").textContent=sg(X,0)+" %";
+ $("szQ").innerHTML=[-30,-15,10,25,50,100].map(v=>`<button type="button" class="chip" data-q="${v}" aria-pressed="${X===v}">${sg(v,0)} %</button>`).join("");
+ if(!SCN){$("szR").innerHTML='<div class="sub" style="padding:10px 0">Die Kurshistorie von Bitcoin und deinen Coins lädt noch. Danach erscheinen hier die Szenarien.</div>';$("szT").innerHTML="";return}
+ const lo=Math.min(c.lo,c.hi),hi=Math.max(c.lo,c.hi),mn=Math.min(lo,c.T)*.97,mx=Math.max(hi,c.T)*1.03,px=v=>((v-mn)/((mx-mn)||1)*100).toFixed(1);
+ $("szR").innerHTML=`<div class="tot2"><span class="sub">Depot im mittleren Fall</span><div class="shv num" style="margin:0">${m(c.mid)}</div><div class="d24"><span class="${cls(c.mid-c.T)}">${S.hide?"":sg(c.mid-c.T,0)+" € · "}${pp(c.mid)}</span> <span class="sub">heute ${m(c.T)}</span></div></div>
+<div class="scb"><i style="left:${px(lo)}%;width:${(px(hi)-px(lo)).toFixed(1)}%"></i><u style="left:${px(c.T)}%"></u><b style="left:${px(c.mid)}%"></b></div>
+<div class="sc3"><div><small>schwacher Fall</small><b>${m(lo)}</b><span>${pp(lo)}</span></div><div><small>mittlerer Fall</small><b>${m(c.mid)}</b><span>${pp(c.mid)}</span></div><div><small>starker Fall</small><b>${m(hi)}</b><span>${pp(hi)}</span></div></div>
+<div class="cl" style="margin-top:14px">Je Klasse im mittleren Fall</div>`+["A","B","C","D"].filter(g=>D.some(d=>d.g===g)).map(g=>{const rs=c.rows.filter(r=>r.d.g===g),v0=rs.reduce((a,r)=>a+r.d.v,0),v1=rs.reduce((a,r)=>a+r.d.v*(1+r.mid/100),0),bw=rs.reduce((a,r)=>a+r.d.v*r.B.b,0)/v0;return`<div class="cr"><span><i class="gd" style="background:${C[g]}"></i>${GN[g]} <small class="sub">Faktor ${bw.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})}</small></span><span>${sg((v1/v0-1)*100)} %<small>${S.hide?"":sg(v1-v0,0)+" €"}</small></span></div>`}).join("");
+ const srt=c.rows.slice().sort((a,b)=>Math.abs(b.d.v*b.mid)-Math.abs(a.d.v*a.mid)),show=VZ.szAll?srt:srt.slice(0,10);
+ $("szT").innerHTML=`<div class="cl" style="margin-top:14px">Je Coin: Faktor zu Bitcoin und erwartete Bewegung</div><div class="anh" style="grid-template-columns:86px 46px minmax(0,1fr) 60px"><span>Coin</span><span style="text-align:right">Faktor</span><span style="text-align:right">Spanne</span><span style="text-align:right">Mitte</span></div>`+show.map(r=>`<button type="button" class="anr" style="grid-template-columns:86px 46px minmax(0,1fr) 60px" data-t="${r.d.t}"><b>${ico(r.d.t)}${r.d.t}</b><span style="text-align:right" class="${r.B.own?"":"ank"}">${r.B.b.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})}${r.B.own?"":"*"}</span><span class="ank" style="text-align:right">${sg(r.lo,0)} bis ${sg(r.hi,0)} %</span><span style="text-align:right"><b class="${cls(r.mid)}">${sg(r.mid,0)} %</b></span></button>`).join("")+`<button type="button" class="lnk" id="szMore" style="margin-top:6px">${VZ.szAll?"Nur die 10 mit der größten Wirkung":"Alle "+srt.length+" zeigen"}</button>`+(c.rows.some(r=>!r.B.own)?'<p class="note">* Für diesen Coin fehlt genug eigene Historie; genommen wird der mittlere Faktor seiner Klasse.</p>':"")}
+function drawSz(){SCN=scnFit();const X=+(S.sz&&S.sz.btc)||0;
+ $("szB").innerHTML=`<div class="tgh"><span>Bitcoin verändert sich um</span><span><b id="szBv"></b></span></div><input type="range" min="-50" max="100" step="5" value="${X}" data-sz="btc" aria-label="Bitcoin-Veränderung in Prozent"><div class="chips" id="szQ" style="margin-top:6px"></div>`;
+ if(SCN){const T=D.reduce((a,d)=>a+d.v,0),fw=k=>D.reduce((a,d)=>a+d.v*scnBeta(d,k).b,0)/T,own=D.filter(d=>SCN.out[d.t]&&SCN.out[d.t].u),beat=own.filter(d=>SCN.out[d.t].u.b>1).length,f1=v=>v.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2}),dm=k=>new Date(k*864e5).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"2-digit"});
+  $("szD").innerHTML=`<div class="kp" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="k" style="background:var(--fill);border-radius:14px;padding:12px"><div class="l sub">Depot-Faktor, wenn Bitcoin steigt</div><div class="v" style="font-size:22px;font-weight:700;text-align:left">${f1(fw("u"))}</div><div class="x sub">aus ${SCN.nUp} Phasen</div></div><div class="k" style="background:var(--fill);border-radius:14px;padding:12px"><div class="l sub">Depot-Faktor, wenn Bitcoin fällt</div><div class="v" style="font-size:22px;font-weight:700;text-align:left">${f1(fw("d"))}</div><div class="x sub">aus ${SCN.nDn} Phasen</div></div></div><p class="note" style="margin-top:8px">Faktor 1,0 heißt: bewegt sich wie Bitcoin. ${beat} von ${own.length} deiner Coins mit eigener Historie stiegen in Bitcoin-Anstiegen stärker als Bitcoin.</p>`;
+  const eps=SCN.epU.concat(SCN.epD).sort((a,b)=>a.k-b.k),mx=Math.max(...eps.flatMap(e=>[Math.abs(e.btc),Math.abs(e.dep)]),1);
+  $("szE").innerHTML=eps.length?eps.map(e=>`<div class="epr"><div class="tgh"><span>${dm(e.k-30)} bis ${dm(e.k)}</span><span class="sub">Faktor ${f1(e.dep/e.btc)}</span></div>${dbar("Bitcoin",e.btc,mx,sg(e.btc)+" %","#FF9F0A","#FF9F0A")}${dbar("Dein Depot",e.dep,mx,sg(e.dep)+" %","#007AFF","#007AFF")}</div>`).join(""):'<div class="sub">In den letzten zwölf Monaten gab es keine 30-Tage-Phase mit mindestens 12 % Bitcoin-Bewegung.</div>'}
+ else{$("szD").innerHTML="";$("szE").innerHTML=""}
+ $("szN").textContent="Datengrundlage: Tageskurse der letzten zwölf Monate deiner Coins und von Bitcoin, in Euro. Für jede 14-Tage-Phase, in der Bitcoin mindestens 5 % stieg (oder fiel), wird gemessen, wie stark jeder Coin mitging; daraus ergibt sich je Coin ein Faktor für Anstiege und ein eigener für Rückgänge. Mittlerer Fall = dieser Faktor, schwacher und starker Fall = unteres und oberes Viertel der beobachteten Phasen. Faktoren sind auf −1 bis 4 begrenzt. Gerechnet mit heutigen Mengen. Vergangenes Verhalten, keine Prognose: In einer echten Altcoin-Phase können die Faktoren deutlich höher liegen als in den letzten zwölf Monaten.";szOut()}
+$("szB").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(!b)return;S.sz=S.sz||{};S.sz.btc=+b.dataset.q;save();const r=document.querySelector('[data-sz="btc"]');if(r)r.value=S.sz.btc;szOut()});
+$("szT").addEventListener("click",e=>{if(e.target.closest("#szMore")){VZ.szAll=!VZ.szAll;szOut();return}const b=e.target.closest("[data-t]");if(b)openSheet(b.dataset.t)});
 applySub();
 render();bgRender();
 {let v="home";try{v=sessionStorage.getItem("depot-view")||"home"}catch(e){}setView(D.length?v:"home")}
