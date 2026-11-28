@@ -242,6 +242,7 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 .jh,.jr{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr 74px 74px;gap:6px;align-items:center}.jh{font-size:11px;color:var(--mut);padding-bottom:4px}.jh span:not(:first-child){text-align:right}
 .jr{width:100%;border:0;border-top:.5px solid var(--ln);background:none;color:var(--ink);font:inherit;font-size:14px;min-height:42px;padding:0;text-align:left;font-variant-numeric:tabular-nums}.jr>span{text-align:right}.jr b{font-weight:600}.jr.on b{color:var(--acc)}.jd{padding:4px 0 12px}
 #jrBox>section{background:var(--card);border-radius:20px;padding:16px;margin-top:12px}
+html{min-height:calc(100% + env(safe-area-inset-top))}
 .tabs{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;padding-bottom:max(4px,calc(env(safe-area-inset-bottom) - 14px))}.tabs::after{content:"";position:absolute;left:0;right:0;top:100%;height:120px;background:var(--card)}
 .tabs button{min-height:46px;gap:1px}.tabs svg{width:22px;height:22px}
 .wrap{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
@@ -596,10 +597,12 @@ html{background:var(--bg);overscroll-behavior-y:none}body{overscroll-behavior-y:
 <h2>Daten</h2>
 <div class="sub" id="ver" style="font-weight:600"></div>
 <div class="sub" id="bkInfo" style="margin:2px 0 8px"></div>
-<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync: Kursabfragen an CoinGecko mit den Coin-Namen (für alle Coins im Katalog der App, auch ohne Bestand) und allgemeine Marktdaten von CoinGecko, DefiLlama und alternative.me. Mengen werden nie übertragen.</p>
+<label style="display:flex;align-items:center;gap:10px;margin:0 0 4px;font-size:15px;font-weight:600"><input type="checkbox" id="autoCb" style="width:22px;height:22px;accent-color:var(--acc)"> Kurse automatisch laden</label>
+<div class="sub" style="margin:0 0 10px">Beim Öffnen der App und danach alle fünf Minuten, solange sie offen ist. Bei geschlossener App lädt nichts; das lässt iOS für diese App-Art nicht zu.</div>
+<p style="margin:0 0 8px;font-size:13px">Bestände, Kurse und Verlauf liegen nur im Speicher dieser App auf dem Gerät. Nach außen geht nur der Sync (von Hand oder, wenn oben eingeschaltet, automatisch bei geöffneter App): Kursabfragen an CoinGecko mit den Coin-Namen (für alle Coins im Katalog der App, auch ohne Bestand) und allgemeine Marktdaten von CoinGecko, DefiLlama und alternative.me. Mengen werden nie übertragen.</p>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
 <label class="btn" style="display:inline-flex;align-items:center;cursor:pointer;position:relative;overflow:hidden">Datei importieren<input id="imp" type="file" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:pointer"></label>
-<button class="btn" id="expBtn" type="button">Backup erstellen</button><button class="btn" id="expFile" type="button">Backup als Datei sichern</button>
+<button class="btn" id="expBtn" type="button">Backup erstellen</button><button class="btn" id="expFile" type="button">Backup als Datei sichern</button><button class="btn" id="wdBtn" type="button">Für Widget kopieren</button>
 <button class="btn" id="pasteBtn" type="button">Aus Feld importieren</button>
 <button class="btn" id="wipeBtn" type="button">Alles löschen</button>
 </div>
@@ -1223,7 +1226,12 @@ function icoLoad(){try{if(navigator.serviceWorker&&navigator.serviceWorker.contr
 $("expFile").addEventListener("click",async()=>{S.bkAt=Date.now();save();drawMeta();const txt=JSON.stringify({app:"depot-backup",ver:VER,at:new Date().toISOString(),state:S,jr:JR||undefined,rec:{asi:MK.asi||[],cap:MK.cap||[],dom:MK.dom||[],mine:MK.mine||[]}}),name="depot-backup-"+new Date().toISOString().slice(0,10)+".json";
  try{const f=new File([txt],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});dmsg("Backup-Datei übergeben. In „Dateien“ sichern.");return}}catch(e){if(e&&e.name==="AbortError"){dmsg("Abgebrochen.");return}}
  try{const u=URL.createObjectURL(new Blob([txt],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);dmsg("Backup-Datei erstellt: "+name)}catch(e){dmsg("Datei konnte nicht erstellt werden. Nutze „Backup erstellen“ und kopiere den Text.",true)}});
-const VER="21",VERD="28.11.2026";
+const AUTO_MS=5*60e3;if(S.auto===undefined)S.auto=true;
+function autoSync(){if(!S.auto||document.hidden||!D.length||S.bgOff)return;const b=$("sync");if(b.disabled||Date.now()<limUntil||Date.now()-(+S.at||0)<AUTO_MS)return;sync()}
+$("autoCb").checked=!!S.auto;$("autoCb").addEventListener("change",e=>{S.auto=e.target.checked;save();if(S.auto)autoSync()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)setTimeout(autoSync,600)});setInterval(autoSync,60e3);setTimeout(autoSync,1200);
+$("wdBtn").addEventListener("click",async()=>{const txt=JSON.stringify({app:"depot-widget",at:new Date().toISOString(),coins:D.map(d=>[d.t,d.id,d.q])});try{await navigator.clipboard.writeText(txt);dmsg("Für das Widget kopiert. Jetzt Scriptable öffnen und das Widget-Skript einmal starten.")}catch(e){$("box").value=txt;$("box").focus();$("box").select();dmsg("Text steht im Feld – bitte kopieren, dann Scriptable öffnen und das Skript starten.")}});
+const VER="24",VERD="28.11.2026";
 function drawMv(pass){const P=[["1","24 h",8],["7","7 T",20],["30","30 T",40],["90","90 T",60]],cur=P.find(p=>p[0]===UI.mp)||P[0],N=+cur[0];
  $("srt").innerHTML=P.map(f=>`<button type="button" class="chip" data-s="${f[0]}" aria-pressed="${cur[0]===f[0]}">${f[1]}</button>`).join("");$("qnote").hidden=true;
  const rows=D.filter(pass).map(d=>{const r=retN(d,N);return{d,r,e:r!==null&&isFinite(r)&&r>-100?d.v-d.v/(1+r/100):0}}),tot=rows.reduce((a,x)=>a+x.e,0),ok=rows.filter(x=>x.r!==null&&isFinite(x.r)),up=ok.filter(x=>x.r>=0).sort((a,b)=>b.r-a.r),dn=ok.filter(x=>x.r<0).sort((a,b)=>a.r-b.r),no=rows.filter(x=>x.r===null||!isFinite(x.r)),srt=ok.map(x=>x.r).sort((a,b)=>a-b),med=srt.length?(srt[Math.floor((srt.length-1)/2)]+srt[Math.ceil((srt.length-1)/2)])/2:null,bt=btcRet(N);
